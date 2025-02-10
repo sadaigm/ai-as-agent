@@ -1,0 +1,30 @@
+.ai__agent {
+    margin-left: 0;
+    margin-right: 0;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.agent__form .ant-card-body, .agent__result .ant-card-body{
+    height: calc(100% - 30px);
+    padding: 10px;
+    overflow-y: auto;
+    max-height: calc( 100vh - 250px);
+}
+.agent__result .ant-card-body pre {
+    border: 1px solid #dce3e7;
+    background-color: #cad4d854;
+    box-shadow: 1px 1px 6px 10px rgb(232 238 242 / 25%);
+    border-radius: 10px;
+}
+
+.agent__result .ant-card-body pre .agent__codeblock .ant-card-head{
+    border-bottom: 1px solid #ff980057;
+}
+.agent__codeblock-nolang {
+    padding: 20px;
+}
+.copied{
+    background-color: aliceblue;
+}
