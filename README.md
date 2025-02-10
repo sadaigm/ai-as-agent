@@ -1,2 +1,2 @@
 # ai-as-agent
-A lightweight AI-as-a-service platform supporting diverse roles, integrating open-source AI models &amp; tools, &amp; enforcing role-based access control through workflows
+A lightweight AI-as-a-service platform supporting diverse roles, integrating open-source AI models &amp; tools through workflows
