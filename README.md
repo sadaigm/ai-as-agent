@@ -1,9 +1,11 @@
 
-# AI Agent UI
+**AI Agent UI** is a lightweight, user-friendly platform that enables users to configure and manage AI agents with ease. Supporting diverse roles and integrating open-source AI models, it provides a flexible environment for creating personalized AI experiences. Through intuitive workflows, users can select models, define system prompts, set user inputs, and adjust response parameters like temperature, all while enabling real-time streaming of responses.
 
-This is a React-based UI that allows users to configure and manage an AI agent, select AI models, set system prompts, input user prompts, and add tools to the agent's configuration. The application supports temperature configuration, streaming responses, and includes functionality to save system prompts for future use.
+The platform also allows users to extend the functionality of their AI agents by adding external tools, such as fetching weather data, making it a versatile solution for a wide range of use cases. With its split-layout design, **AI Agent UI** ensures a seamless user experience for both configuring agents and displaying real-time responses.
 
-This project is built using **Vite** as the development server and bundler, offering fast build and hot-reload speeds.
+**AI Agent UI** goes beyond basic interactions, with plans to include advanced features like customizable **AI Roles** to define specialized agent behaviors (e.g., Assistant, Researcher) and a dedicated **AI Tools Page** to manage integrated tools. These features are in active development to further enhance the platform’s capabilities.
+
+Designed with flexibility in mind, **AI Agent UI** is the ideal tool for users looking to build, test, and manage diverse AI agents, all while leveraging powerful open-source AI models and tools.
 
 ## Features (Ongoing Development)
 
