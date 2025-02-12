@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Form,
   Input,
@@ -19,18 +19,18 @@ import {
 } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import "./aiagent.css";
-import { streamData } from "./mock";
 import { getSystemPromptTemplates, getTools } from "../utils/service";
 import { getFuncParamsString } from "../utils/function";
-import { SystemRolePrompt, Tool } from "./types/tool";
+import { SystemRolePrompt, Tool, convertTools2AgentTools } from "./types/tool";
 import ReactMarkdown from "react-markdown";
-import CodeBlock , {PreBlock} from "./response/CodeBlock";
+import CodeBlock, { PreBlock } from "./response/CodeBlock";
+import { useSubmitHandler } from "../hooks/useSubmitHandler";
+import { useModels } from "../hooks/useModels";
 
 const { TextArea } = Input;
 
 const ToolList = getTools();
 
-const apiBase: string = "http://127.0.0.1:11434/v1/";
 
 const AIAgentUI = () => {
   const [form] = Form.useForm();
@@ -38,9 +38,9 @@ const AIAgentUI = () => {
   const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [responseData, setResponseData] = useState(null); // Store API response
-  const [streamingData, setStreamingData] = useState(""); // Store streamed data
-  const [models, setModels] = useState([]); // Store list of models
+  const [responseData, setResponseData] = useState(null);
+  const [streamingData, setStreamingData] = useState("");
+  const { models } = useModels();
   const [sysPromptDisabled, setsysPromptDisabled] = useState(true);
   const [sysPromptData, setsysPromptData] = useState<SystemRolePrompt>(
     {} as SystemRolePrompt
@@ -48,28 +48,20 @@ const AIAgentUI = () => {
   const [sysPromptList, setsysPromptList] = useState<SystemRolePrompt[]>(
     getSystemPromptTemplates() || []
   );
-
   const [availableTools, setAvailableTools] = React.useState(ToolList);
-  const [abortController, setAbortController] = useState<AbortController | null>(null); // Keep track of the AbortController
+  const [abortController, setAbortController] =
+    useState<AbortController | null>(null);
 
-  // Fetch the list of models from the API when the component mounts
-  useEffect(() => {
-    const fetchModels = async () => {
-      try {
-        const response = await fetch(apiBase + "models");
-        const data = await response.json();
-        if (data && data.data) {
-          setModels(data.data); // Set models in state
-        } else {
-          message.error("Failed to fetch models");
-        }
-      } catch (error) {
-        message.error("Error fetching models");
-      }
-    };
+  const handleSubmit = useSubmitHandler({
+    setLoading,
+    setResponseData,
+    setStreamingData,
+    setAbortController,
+  });
 
-    fetchModels();
-  }, []); // Empty dependency array to fetch once when component mounts
+  console.log({streamingData})
+
+  
 
   const handleToolSelect = (tool: any) => {
     setSelectedTool(tool);
@@ -78,9 +70,17 @@ const AIAgentUI = () => {
 
   const handleAddTool = () => {
     if (selectedTool) {
-      setTools([...tools, selectedTool]);
-      console.log({selectedTool},`${selectedTool.type}:${selectedTool.function.name} added to tools list`)
-      message.success(`${selectedTool.type}:${selectedTool.function.name} added to tools list`);
+      const updatedTools = [...tools, selectedTool];
+      const agentTools = convertTools2AgentTools(updatedTools)
+      form.setFieldValue("tools", agentTools);
+      setTools(updatedTools);
+      console.log(
+        { selectedTool },
+        `${selectedTool.type}:${selectedTool.function.name} added to tools list`
+      );
+      message.success(
+        `${selectedTool.type}:${selectedTool.function.name} added to tools list`
+      );
       setIsModalVisible(false);
     }
   };
@@ -90,105 +90,6 @@ const AIAgentUI = () => {
       abortController.abort(); // Abort the fetch request if in progress
       message.warning("Request was canceled");
       setLoading(false); // Stop loading
-    }
-  };
-
-  const handleSubmit = async (values: any) => {
-    setLoading(true);
-    setResponseData(null);
-    setStreamingData("");
-    
-    const controller = new AbortController(); // Create a new AbortController instance
-    setAbortController(controller); // Set the controller to be able to abort later
-
-    const payload = {
-      model: values.model,
-      messages: [
-        { role: "system", content: values.systemPrompt },
-        { role: "user", content: values.userPrompt },
-      ],
-      temperature: values.temperature,
-      stream: values.stream,
-    };
-
-    try {
-      const response = await fetch(apiBase + "chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-        signal: controller.signal, // Attach the signal to the fetch request
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to send request");
-      }
-
-      if (values.stream) {
-        const reader = response.body?.getReader();
-        const decoder = new TextDecoder();
-        let done = false;
-        let text = ""; // Accumulate the chunks of data
-
-        while (!done) {
-          const { value, done: readerDone } = (await reader?.read()) || {};
-          done = readerDone || false;
-
-          if (controller.signal.aborted) {
-            break; // If the request is aborted, stop the stream
-          }
-
-          if (value) {
-            text += decoder.decode(value, { stream: true });
-
-            const chunks = text.split("data: ");
-            let chunk = chunks[1];
-
-            if (chunk.trim()) {
-              try {
-                const formattedJSON = JSON.parse(chunk);
-
-                if (
-                  formattedJSON?.choices &&
-                  formattedJSON.choices[0]?.delta?.content
-                ) {
-                  setStreamingData((prevData) =>
-                    prevData + formattedJSON.choices[0].delta.content
-                  );
-                }
-              } catch (error) {
-                console.log("Waiting for valid JSON...");
-              }
-            }
-
-            text = chunks[chunks.length - 1];
-          }
-        }
-
-        message.success("Streaming completed");
-      } else {
-        const data = await response.json();
-         // Store response in state if not streaming
-        if (
-          data?.choices && 
-          data.choices[0].finish_reason==='stop'
-          && data.choices[0]?.message?.content 
-          && data.choices[0]?.message?.role === "assistant"
-        ) {
-          console.log({data})
-          setResponseData(data.choices[0]?.message?.content);
-        }
-        
-      }
-    } catch (error: any) {
-      if (error.name === "AbortError") {
-        console.log("Request was canceled");
-      } else {
-        message.error(`Error: ${error.message}`);
-      }
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -226,36 +127,35 @@ const AIAgentUI = () => {
           flexDirection: "column",
         }}
       >
-         <Form
-            form={form}
-            onFinish={handleSubmit}
-            initialValues={{
-              temperature: 0.8, // Set initial temperature to 0.8
-              stream: true, // Set initial stream to true
-            }}
-            layout="vertical"
-          >
-        <Card
-          className="agent__form"
-          title="AI Agent Configuration"
-          bordered={false}
-          style={{ flex: 1 }}
-          extra={
-            <Space>
-            <Button type="primary" htmlType="submit" loading={loading}>
-              Submit
-            </Button>
-            <Button
-              type="default"
-              onClick={handleCancel}
-              disabled={!loading}
-            >
-              Cancel
-            </Button>
-          </Space>
-          }
+        <Form
+          form={form}
+          onFinish={handleSubmit}
+          initialValues={{
+            temperature: 0.8, // Set initial temperature to 0.8
+            stream: true, // Set initial stream to true
+          }}
+          layout="vertical"
         >
-         
+          <Card
+            className="agent__form"
+            title="AI Agent Configuration"
+            bordered={false}
+            style={{ flex: 1 }}
+            extra={
+              <Space>
+                <Button type="primary" htmlType="submit" loading={loading}>
+                  Submit
+                </Button>
+                <Button
+                  type="default"
+                  onClick={handleCancel}
+                  disabled={!loading}
+                >
+                  Cancel
+                </Button>
+              </Space>
+            }
+          >
             <Form.Item
               label="Model"
               name="model"
@@ -399,7 +299,7 @@ const AIAgentUI = () => {
             <Divider />
 
             <Typography.Title level={4}>Selected Tools</Typography.Title>
-            
+
             <List
               size="small"
               bordered
@@ -409,7 +309,7 @@ const AIAgentUI = () => {
                 },
                 pageSize: 3,
               }}
-              style={{maxHeight:'180px'}}
+              style={{ maxHeight: "180px" }}
               dataSource={tools}
               renderItem={(tool) => (
                 <List.Item>
@@ -436,20 +336,24 @@ const AIAgentUI = () => {
                   style={{ width: "100%" }}
                 />
                 <List
-                 pagination={{
-                  onChange: (page) => {
-                    console.log(page);
-                  },
-                  pageSize: 3,
-                }}
-                style={{maxHeight:'180px'}}
+                  pagination={{
+                    onChange: (page) => {
+                      console.log(page);
+                    },
+                    pageSize: 3,
+                  }}
+                  style={{ maxHeight: "180px" }}
                   dataSource={availableTools}
                   bordered
                   renderItem={(tool) => (
                     <List.Item
                       actions={[
                         <Button
-                         disabled={tools.findIndex(t => t.function.name === tool.function.name)>-1}
+                          disabled={
+                            tools.findIndex(
+                              (t) => t.function.name === tool.function.name
+                            ) > -1
+                          }
                           type="primary"
                           size="small"
                           onClick={() => handleToolSelect(tool)}
@@ -464,24 +368,21 @@ const AIAgentUI = () => {
                 />
               </div>
             </Form.Item>
-          
-                  
-        </Card>
+          </Card>
         </Form>
         <Modal
-            title="Add Tool"
-            visible={isModalVisible}
-            onOk={handleAddTool}
-            onCancel={() => setIsModalVisible(false)}
-            okText="Add Tool"
-            cancelText="Cancel"
-          >
-            <p>
-              Are you sure you want to add{" "}
-              <strong>{selectedTool?.function.name}</strong> to the current
-              form?
-            </p>
-          </Modal>  
+          title="Add Tool"
+          visible={isModalVisible}
+          onOk={handleAddTool}
+          onCancel={() => setIsModalVisible(false)}
+          okText="Add Tool"
+          cancelText="Cancel"
+        >
+          <p>
+            Are you sure you want to add{" "}
+            <strong>{selectedTool?.function.name}</strong> to the current form?
+          </p>
+        </Modal>
       </Col>
 
       {/* Right Column - Result Panel */}
@@ -500,49 +401,37 @@ const AIAgentUI = () => {
           style={{ flex: 1 }}
           extra={
             <Space>
-              <Button onClick={() => {
-                setResponseData(null);
-                setStreamingData("");
-
-              }}>Clear</Button>
+              <Button
+                onClick={() => {
+                  setResponseData(null);
+                  setStreamingData("");
+                }}
+              >
+                Clear
+              </Button>
             </Space>
           }
         >
           {streamingData ? (
             <>
-            <ReactMarkdown
-            components={{
-              pre: PreBlock,
-              code: CodeBlock
-            }}
-            
-            children={streamingData} />
-            {/* <pre
-              style={{
-                height: "calc(100% - 40px)",
-                display: "flex",
-                overflowY: "auto",
-              }}
-              >
-              <code style={{ whiteSpace: "break-spaces" }}>
-                {streamingData}
-              </code>
-            </pre> */}
-              </>
+              <ReactMarkdown
+                components={{
+                  pre: PreBlock,
+                  code: CodeBlock,
+                }}
+                children={streamingData}
+              />
+            </>
           ) : responseData ? (
             <>
-            <ReactMarkdown 
-            components={{
-              code: PreBlock,
-            }
-            }
-            children={responseData} />
-            {/* <pre>{JSON.stringify(responseData, null, 2)}</pre> */}
+              <ReactMarkdown
+                components={{
+                  code: PreBlock,
+                }}
+                children={responseData}
+              />
             </>
           ) : (
-            // <Typography.Text>
-            //   No response data yet. Submit a request to get results.
-            // </Typography.Text>
             <Empty />
           )}
         </Card>
