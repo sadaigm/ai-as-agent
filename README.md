@@ -1,5 +1,6 @@
+# AI Agent UI
 
-**AI Agent UI** is a lightweight, user-friendly platform that enables users to configure and manage AI agents with ease. Supporting diverse roles and integrating open-source AI models, it provides a flexible environment for creating personalized AI experiences. Through intuitive workflows, users can select models, define system prompts, set user inputs, and adjust response parameters like temperature, all while enabling real-time streaming of responses.
+AI Agent UI is a lightweight, user-friendly platform that enables users to configure and manage AI agents with ease. Supporting diverse roles and integrating open-source AI models, it provides a flexible environment for creating personalized AI experiences. Through intuitive workflows, users can select models, define system prompts, set user inputs, and adjust response parameters like temperature, all while enabling real-time streaming of responses.
 
 The platform also allows users to extend the functionality of their AI agents by adding external tools, such as fetching weather data, making it a versatile solution for a wide range of use cases. With its split-layout design, **AI Agent UI** ensures a seamless user experience for both configuring agents and displaying real-time responses.
 
