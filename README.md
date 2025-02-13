@@ -50,7 +50,7 @@ Start the development server with Vite:
 npm run dev
 ```
 
-This will start the Vite development server, and you can view the application at `http://localhost:3000`.
+This will start the Vite development server, and you can view the application at `http://localhost:5173`.
 
 ### 4. Build for Production
 
@@ -131,6 +131,8 @@ As an example, a tool for getting the current weather has been implemented. This
   ![Role Based Configuration 1](./screenshots/role_based_1.png)
   ![Role Based Configuration 2](./screenshots/role_based_2.png)
   ![Role Based Configuration 3](./screenshots/role_based_3.png)
+  ![List of Agent Roles](./screenshots/Agent%20Role.png)
+  ![List of Agent Tools](./screenshots/tools.png)
 
 
 ## Dependencies
