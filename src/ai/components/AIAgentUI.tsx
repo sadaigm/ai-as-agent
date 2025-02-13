@@ -19,9 +19,9 @@ import {
 } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import "./aiagent.css";
-import { getSystemPromptTemplates, getTools } from "../utils/service";
+import { getSystemPromptTemplates as getRoleSystemPromptTemplates, getTools } from "../utils/service";
 import { getFuncParamsString } from "../utils/function";
-import { SystemRolePrompt, Tool, convertTools2AgentTools } from "./types/tool";
+import { ChatPayload, SystemRolePrompt, Tool, convertTools2AgentTools } from "./types/tool";
 import ReactMarkdown from "react-markdown";
 import CodeBlock, { PreBlock } from "./response/CodeBlock";
 import { useSubmitHandler } from "../hooks/useSubmitHandler";
@@ -46,11 +46,23 @@ const AIAgentUI = () => {
     {} as SystemRolePrompt
   );
   const [sysPromptList, setsysPromptList] = useState<SystemRolePrompt[]>(
-    getSystemPromptTemplates() || []
+     []
   );
-  const [availableTools, setAvailableTools] = React.useState(ToolList);
+  const [availableTools, setAvailableTools] = React.useState<Tool[]>([]);
+  const [allTools, setAllTools] = React.useState<Tool[]>([]);
   const [abortController, setAbortController] =
     useState<AbortController | null>(null);
+
+  React.useEffect(() => {
+    ToolList.then((data) => {
+      setAvailableTools(data);
+      setAllTools(data);
+    });
+    getRoleSystemPromptTemplates().then((data) => {
+      setsysPromptList(data);
+    });
+    
+  },[])
 
   const handleSubmit = useSubmitHandler({
     setLoading,
@@ -58,6 +70,23 @@ const AIAgentUI = () => {
     setStreamingData,
     setAbortController,
   });
+
+  const executeChatService = (values: any) => {
+    const payload: ChatPayload = {
+      model: values.model,
+      messages: [
+        { role: "system", content: values.systemPrompt },
+        { role: "user", content: values.userPrompt },
+      ],
+      temperature: values.temperature,
+      stream: values.stream,
+    };
+    if (values.tools) {
+      payload.tools = values.tools;
+      payload.stream = false;
+    }
+    handleSubmit(payload);
+  }
 
   console.log({streamingData})
 
@@ -84,6 +113,22 @@ const AIAgentUI = () => {
       setIsModalVisible(false);
     }
   };
+
+  const removeTool = (tool: Tool) => {
+    const updatedTools = tools.filter(
+      (t) => t.function.name !== tool.function.name
+    );
+    const agentTools = convertTools2AgentTools(updatedTools)
+    form.setFieldValue("tools", agentTools);
+    setTools(updatedTools);
+    console.log(
+      { tool },
+      `${tool.type}:${tool.function.name} removed from tools list`
+    );
+    message.info(
+      `${tool.type}:${tool.function.name} removed from tools list`
+    );
+  }
 
   const handleCancel = () => {
     if (abortController) {
@@ -129,7 +174,7 @@ const AIAgentUI = () => {
       >
         <Form
           form={form}
-          onFinish={handleSubmit}
+          onFinish={executeChatService}
           initialValues={{
             temperature: 0.8, // Set initial temperature to 0.8
             stream: true, // Set initial stream to true
@@ -181,7 +226,7 @@ const AIAgentUI = () => {
                 onSelect={(value) => {
                   console.log(value);
                   if (value !== "new_role") {
-                    const data = getSystemPromptTemplates().find(
+                    const data = sysPromptList.find(
                       (r) => r.id === value
                     );
                     if (data) {
@@ -312,7 +357,15 @@ const AIAgentUI = () => {
               style={{ maxHeight: "180px" }}
               dataSource={tools}
               renderItem={(tool) => (
-                <List.Item>
+                <List.Item actions={[
+                  <Button
+                          type="primary"
+                          size="small"
+                          onClick={() => removeTool(tool)}
+                        >
+                          delete
+                        </Button>
+                ]} >
                   {tool.type} : {getFuncParamsString(tool)}
                 </List.Item>
               )}
@@ -330,7 +383,7 @@ const AIAgentUI = () => {
                       );
                       setAvailableTools(filtered);
                     } else {
-                      setAvailableTools(ToolList);
+                      setAvailableTools(allTools);
                     }
                   }}
                   style={{ width: "100%" }}

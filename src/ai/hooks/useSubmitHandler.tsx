@@ -19,26 +19,25 @@ export const useSubmitHandler = ({
   setAbortController,
 }: SubmitHandlerParams) => {
   const chatService: ChatService = createChatService();
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (payload: ChatPayload) => {
     setLoading(true);
     setResponseData(null);
     setStreamingData("");
-    console.log({ values });
+    console.log({ payload });
 
     const controller = new AbortController();
     setAbortController(controller);
 
-    const payload: ChatPayload = {
-      model: values.model,
-      messages: [
-        { role: "system", content: values.systemPrompt },
-        { role: "user", content: values.userPrompt },
-      ],
-      temperature: values.temperature,
-      stream: values.stream,
-    };
-    if (values.tools) {
-      payload.tools = values.tools;
+    // const payload: ChatPayload = {
+    //   model: values.model,
+    //   messages: [
+    //     { role: "system", content: values.systemPrompt },
+    //     { role: "user", content: values.userPrompt },
+    //   ],
+    //   temperature: values.temperature,
+    //   stream: values.stream,
+    // };
+    if (payload.tools) {
       payload.stream = false;
     }
 
@@ -98,7 +97,7 @@ export const useSubmitHandler = ({
             setResponseData(data);
           }
         });
-        Promise.resolve();
+        // Promise.resolve();
       }
     } catch (error: any) {
       if (error.name === "AbortError") {

@@ -25,8 +25,9 @@ export class WeatherFunction implements AgentToolFunction {
     const temperature = Math.random() * 10;
     const content = {
       temperature: `${temperature} degree celsius`,
-      location: "Paris",
+      location: params.location,
     };
+    console.log({toolName: this.toolName, params,content})
     const response : AgentToolFunctionResponse = {
       role: "tool",
       tool_call_id: this.id,

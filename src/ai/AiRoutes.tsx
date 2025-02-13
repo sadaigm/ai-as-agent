@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import AIAgentUI from "./components/AIAgentUI";
-import ToolList from "./pages/ToolList";
-import Roles from "./pages/Roles";
+import ToolPage from "./pages/ToolPage";
+import SystemRolePage from "./pages/SystemRolePage";
 
 
 const AiRoutes = () => {
@@ -27,7 +27,7 @@ const AiRoutes = () => {
             path={("/tools")}
             element={
               <>
-                <ToolList />
+                <ToolPage />
               </>
             }
           />
@@ -35,7 +35,7 @@ const AiRoutes = () => {
             path={("/roles")}
             element={
               <>
-                <Roles />
+                <SystemRolePage />
               </>
             }
           />

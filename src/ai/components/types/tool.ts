@@ -21,6 +21,11 @@ export interface Tool {
     description: string;
     parameters: Parameter[];
   };
+  id: string;
+  toolName: string;
+  method?: 'GET'|'POST';
+  url?: string;
+  bodyType?: 'JSON'|'STRING'|'FORM';
 }
 export type Property = {
   type: string;
@@ -90,7 +95,8 @@ export const convertTools2AgentTools = (tools: Tool[]): AgentTool[] => {
       required,
     };
     const functionV1 = { ...tool.function, parameters };
-    const agentT: AgentTool = { ...tool, function: functionV1 };
+    const agentT: AgentTool = { type: 'function', function: functionV1 };
+    console.log({ agentT });
     return agentT;
   });
 };
