@@ -3,6 +3,7 @@ import { useSystemRole } from "../hooks/useSystemRole";
 import SystemRoleList from "./roles/SystemRoleList";
 import { Button, Empty, notification } from "antd";
 import AddSystemRole from "./roles/AddSystemRole";
+import "./role.css";
 
 const SystemRolePage = () => {
   const { errorMessage, systemRolePrompts, saveSystemRolePrompt } = useSystemRole();
@@ -26,7 +27,12 @@ const SystemRolePage = () => {
   }
 
   return (
-    <div>
+    <div className="system__roles" style={{
+      height:"100%",
+      width:"100%",
+      overflowY:"auto",
+      padding:"10px"
+    }}>
       <Button
         type="primary"
         onClick={showModal}
