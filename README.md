@@ -133,6 +133,10 @@ As an example, a tool for getting the current weather has been implemented. This
   ![Role Based Configuration 3](./screenshots/role_based_3.png)
   ![List of Agent Roles](./screenshots/Agent%20Role.png)
   ![List of Agent Tools](./screenshots/tools.png)
+  ![Import Agent Tools from Swagger Config Json - Step1](./screenshots/import_1.png)
+  ![Import Agent Tools from Swagger Config Json - Step2](./screenshots/import_2.png)
+  ![Import Agent Tools from Swagger Config Json - Step3](./screenshots/import_3.png)
+  ![Import Agent Tools from Swagger Config Json - Step4](./screenshots/import_4.png)
 
 
 ## Dependencies
