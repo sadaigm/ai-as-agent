@@ -1,0 +1,115 @@
+body {
+  margin: 0;
+}
+/* width */
+::-webkit-scrollbar {
+   width: 8px;
+ }
+ 
+ /* Track */
+ ::-webkit-scrollbar-track {
+   background: #f1f1f1; 
+ }
+  
+ /* Handle */
+ ::-webkit-scrollbar-thumb {
+   background: #888; 
+ }
+ 
+ /* Handle on hover */
+ ::-webkit-scrollbar-thumb:hover {
+   background: #555; 
+ }
+
+ @media screen and (max-width: 768px){
+  ::-webkit-scrollbar {
+      -webkit-appearance: none;
+  }
+}
+
+.ex4 {
+  color: aqua;
+}
+
+.modal {
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+}
+.padding-zero .ant-card-body{
+   padding: 10px;
+   height: calc(100% - 60px)
+}
+
+
+
+.savebtn:hover {
+  color: #4CAF50 !important;
+  border-color: #8BC34A !important;
+}
+
+.dangerbtn:hover {
+  color: #F44336 !important;
+  border-color: #F44336 !important;
+}
+
+.exportbtn:hover {
+  color: #673ab7 !important;
+  border-color: #673ab7 !important;
+
+}
+
+.bluebtn:hover {
+  color: #2196f3 !important;
+  border-color: #2196f3 !important;
+}
+.editbtn:hover{
+  color: #ff9800 !important;
+  border-color: #ffc107 !important;
+}
+
+.fullmodel {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 100%;
+  max-height: 100%;
+}
+
+.fullmodel .ant-modal-content {
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  max-height: 100%;
+  border-radius: 0;
+}
+
+.fullmodel .ant-modal-header {
+  height: 50px;
+  display: flex;
+  align-items: center;
+}
+
+.fullmodel .ant-modal-body {
+  height: calc(100% - 140px );
+  background-color: #f5f5f5;
+  padding:10px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 10px;
+}
+.site-layout{
+    height: 100vh;
+}

@@ -1,0 +1,4 @@
+.tool__item .ant-card-body {
+    overflow-y: auto;
+    height: calc(100% - 60px);
+}

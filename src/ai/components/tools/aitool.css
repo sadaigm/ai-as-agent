@@ -1,0 +1,31 @@
+.add__aitool {
+    width: 100%;
+    /* transform-origin: -907px 14px; */
+    height: 100%;
+    top: 0;
+    margin: 0;
+    display: contents;
+}
+
+.add__aitool .add__aitool-form {
+    height: 100%;
+}
+
+.add__aitool .ant-modal,.add__aitool .ant-modal-content {
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+    top: 0;
+   }
+.aitool__item .ant-card-body{
+    padding: 10px;
+}
+
+.aitool__item .ant-card-body p {
+    margin: 0;
+}
+
+.add__aitool .ant-modal-body {
+    height: calc(100vh - 110px);
+    overflow-y:auto;
+   }
