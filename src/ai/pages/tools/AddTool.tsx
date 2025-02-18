@@ -46,7 +46,7 @@ const AddTool: FC<AddToolProps> = ({
         { role: "system", content: "You are a Document writer." },
         {
           role: "user",
-          content: `write a single line tool description for the toolname: ${toolName} so the use will understand what the tool does.`,
+          content: `write a single line tool description for the toolname: ${toolName} so the use will understand what the tool does. just return description DONOT add explaination`,
         },
       ],
       temperature: 0.8,

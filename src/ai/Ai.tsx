@@ -8,6 +8,7 @@ import {
 } from "@ant-design/icons";
 import { Button, Layout, Menu, MenuProps, theme } from "antd";
 import AiRoutes from "./AiRoutes";
+import { useInitData } from "./hooks/useInitData";
 
 const { Header, Sider, Content } = Layout;
 
@@ -21,12 +22,15 @@ const Ai = () => {
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
-  const [current, setCurrent] = useState(window.location.pathname.replace("/","")||'agents');
-  const onClick: MenuProps['onClick'] = (e) => {
-    console.log('click ', e);
+  const [current, setCurrent] = useState(
+    window.location.pathname.replace("/", "") || "agents"
+  );
+  const onClick: MenuProps["onClick"] = (e) => {
+    console.log("click ", e);
     setCurrent(e.key);
-    window.location.assign('/'+e.key);
+    window.location.assign("/" + e.key);
   };
+  useInitData();
   return (
     <div>
       <Layout className="site-layout">
@@ -94,12 +98,12 @@ const Ai = () => {
               margin: "24px 16px",
               padding: 24,
               minHeight: 280,
-              height:"100%",
+              height: "100%",
               background: colorBgContainer,
               borderRadius: borderRadiusLG,
             }}
           >
-            <AiRoutes /> 
+            <AiRoutes />
           </Content>
         </Layout>
       </Layout>

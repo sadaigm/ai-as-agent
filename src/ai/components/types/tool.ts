@@ -26,6 +26,8 @@ export interface Tool {
   method?: 'GET'|'POST';
   url?: string;
   bodyType?: 'JSON'|'STRING'|'FORM';
+  query? :string[]
+  body? :string[]
 }
 export type Property = {
   type: string;
@@ -51,7 +53,9 @@ export type AgentTool = {
   };
 };
 
-
+export type ChatHistory = {
+[key: string]: Array<UserMessage|ToolMessage| AgentToolFunctionResponse>;
+}
 export type UserMessage = { role: string; content: any };
 export type SystemMessage = UserMessage & {  };
 export type ToolMessage = { role: string, tool_calls: ToolCall[] };

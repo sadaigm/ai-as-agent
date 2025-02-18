@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Card, Row, Col, Button } from "antd";
 import "./toolitem.css";
 import EditTool from "./EditTool";
+import {EditOutlined} from "@ant-design/icons"; 
 
 export interface Parameter {
   name: string;
@@ -40,7 +41,7 @@ const ToolItem: React.FC<ToolItemProps> = ({ tool, onEdit }) => {
         height: "350px",
         //  width:'350px'
       }}
-      extra={<Button onClick={onEdit}>Edit</Button>}
+      extra={<Button icon={<EditOutlined />} onClick={onEdit}>Edit</Button>}
     >
       <p>
         <strong>Function Name:</strong> {tool.function.name}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Form,
   Input,
@@ -17,20 +17,37 @@ import {
   Space,
   Empty,
 } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import {
+  SearchOutlined,
+  PlusOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
 import "./aiagent.css";
-import { getSystemPromptTemplates as getRoleSystemPromptTemplates, getTools } from "../utils/service";
+import {
+  getSystemPromptTemplates as getRoleSystemPromptTemplates,
+  getTools,
+} from "../utils/service";
 import { getFuncParamsString } from "../utils/function";
-import { ChatPayload, SystemRolePrompt, Tool, convertTools2AgentTools } from "./types/tool";
+import {
+  ChatHistory,
+  ChatPayload,
+  SystemRolePrompt,
+  Tool,
+  ToolMessage,
+  UserMessage,
+  convertTools2AgentTools,
+} from "./types/tool";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import CodeBlock, { PreBlock } from "./response/CodeBlock";
 import { useSubmitHandler } from "../hooks/useSubmitHandler";
 import { useModels } from "../hooks/useModels";
+import { AgentToolFunctionResponse } from "../core/AgentToolFunction";
+import { getFullPrompt } from "../const";
 
 const { TextArea } = Input;
 
 const ToolList = getTools();
-
 
 const AIAgentUI = () => {
   const [form] = Form.useForm();
@@ -45,11 +62,14 @@ const AIAgentUI = () => {
   const [sysPromptData, setsysPromptData] = useState<SystemRolePrompt>(
     {} as SystemRolePrompt
   );
-  const [sysPromptList, setsysPromptList] = useState<SystemRolePrompt[]>(
-     []
-  );
+  const [sysPromptList, setsysPromptList] = useState<SystemRolePrompt[]>([]);
   const [availableTools, setAvailableTools] = React.useState<Tool[]>([]);
   const [allTools, setAllTools] = React.useState<Tool[]>([]);
+  const [chatHistory, setchatHistory] = useState<ChatHistory>({});
+
+  const [conversation, setConversation] = useState<
+    Array<UserMessage | ToolMessage | AgentToolFunctionResponse>
+  >([]);
   const [abortController, setAbortController] =
     useState<AbortController | null>(null);
 
@@ -61,9 +81,31 @@ const AIAgentUI = () => {
     getRoleSystemPromptTemplates().then((data) => {
       setsysPromptList(data);
     });
-    
-  },[])
+  }, []);
 
+  useEffect(() => {
+    if (!loading && (responseData || streamingData)) {
+      if (responseData) {
+        setConversation((prev) => [
+          ...prev,
+          { role: "assistant", content: responseData },
+        ]);
+      } else if (streamingData) {
+        setConversation((prev) => [
+          ...prev,
+          { role: "assistant", content: streamingData },
+        ]);
+      }
+    }
+  }, [loading, responseData, streamingData]);
+
+  useEffect(() => {
+    console.log("debug", { conversation });
+  }, [conversation]);
+
+  useEffect(() => {
+    console.log("debug", { chatHistory });
+  }, [chatHistory]);
   const handleSubmit = useSubmitHandler({
     setLoading,
     setResponseData,
@@ -72,10 +114,21 @@ const AIAgentUI = () => {
   });
 
   const executeChatService = (values: any) => {
+    const aiReplies = conversation.filter((c) => c.role === "assistant");
+    console.log("debug", aiReplies);
+    // const updated = [...lastAIResponse, { role: "user", content: values.userPrompt }]
+    //   setConversation(updated);
+    const updated = [
+      ...conversation,
+      { role: "user", content: values.userPrompt },
+    ];
+    setConversation(updated);
+
     const payload: ChatPayload = {
       model: values.model,
       messages: [
-        { role: "system", content: values.systemPrompt },
+        { role: "system", content: getFullPrompt(values.systemPrompt) },
+        ...aiReplies,
         { role: "user", content: values.userPrompt },
       ],
       temperature: values.temperature,
@@ -86,11 +139,9 @@ const AIAgentUI = () => {
       payload.stream = false;
     }
     handleSubmit(payload);
-  }
+  };
 
-  console.log({streamingData})
-
-  
+  console.log({ streamingData });
 
   const handleToolSelect = (tool: any) => {
     setSelectedTool(tool);
@@ -100,7 +151,7 @@ const AIAgentUI = () => {
   const handleAddTool = () => {
     if (selectedTool) {
       const updatedTools = [...tools, selectedTool];
-      const agentTools = convertTools2AgentTools(updatedTools)
+      const agentTools = convertTools2AgentTools(updatedTools);
       form.setFieldValue("tools", agentTools);
       setTools(updatedTools);
       console.log(
@@ -118,17 +169,15 @@ const AIAgentUI = () => {
     const updatedTools = tools.filter(
       (t) => t.function.name !== tool.function.name
     );
-    const agentTools = convertTools2AgentTools(updatedTools)
+    const agentTools = convertTools2AgentTools(updatedTools);
     form.setFieldValue("tools", agentTools);
     setTools(updatedTools);
     console.log(
       { tool },
       `${tool.type}:${tool.function.name} removed from tools list`
     );
-    message.info(
-      `${tool.type}:${tool.function.name} removed from tools list`
-    );
-  }
+    message.info(`${tool.type}:${tool.function.name} removed from tools list`);
+  };
 
   const handleCancel = () => {
     if (abortController) {
@@ -188,11 +237,16 @@ const AIAgentUI = () => {
             style={{ flex: 1 }}
             extra={
               <Space>
-                <Button type="primary" htmlType="submit" loading={loading}>
+                <Button 
+                color={'primary'}
+                variant="outlined"
+
+                htmlType="submit" loading={loading}>
                   Submit
                 </Button>
                 <Button
-                  type="default"
+                  color={'danger'}
+                  variant="outlined"
                   onClick={handleCancel}
                   disabled={!loading}
                 >
@@ -206,7 +260,13 @@ const AIAgentUI = () => {
               name="model"
               rules={[{ required: true, message: "Please select a model" }]}
             >
-              <Select placeholder="Select a model" allowClear>
+              <Select
+                placeholder="Select a model"
+                onSelect={(value) => {
+                  localStorage.setItem("selectedModel", value);
+                }}
+                allowClear
+              >
                 {models.map((model: any) => (
                   <Select.Option key={model.id} value={model.id}>
                     {model.id}
@@ -225,17 +285,30 @@ const AIAgentUI = () => {
                 placeholder="Select a Role"
                 onSelect={(value) => {
                   console.log(value);
+                  if (sysPromptData.systemRole) {
+                    setchatHistory((prev) => {
+                      return {
+                        ...prev,
+                        [sysPromptData.systemRole]: conversation,
+                      };
+                    });
+                  }
+
                   if (value !== "new_role") {
-                    const data = sysPromptList.find(
-                      (r) => r.id === value
-                    );
+                    const data = sysPromptList.find((r) => r.id === value);
                     if (data) {
                       console.log({ data });
                       setsysPromptData(data);
                       form.setFieldValue("systemPrompt", data.systemPrompt);
                       form.setFieldValue("systemRole", data.systemRole);
+                      if (Object.keys(chatHistory).includes(data.systemRole)) {
+                        setConversation(chatHistory[data.systemRole] || []);
+                      } else {
+                        setConversation([]);
+                      }
                     }
                   } else {
+                    setConversation([]);
                     form.setFieldValue("systemRole", "");
                     setsysPromptData((prev) => {
                       return {
@@ -246,6 +319,8 @@ const AIAgentUI = () => {
                   }
                 }}
                 allowClear
+                showSearch // Enable search functionality
+                optionFilterProp="children" // This enables the search to filter based on option's text
               >
                 <Select.Option key={`new_role`} value={"new_role"}>
                   {"New Role"}
@@ -306,7 +381,8 @@ const AIAgentUI = () => {
             <div style={{ marginTop: "10px" }}>
               <Button
                 disabled={sysPromptDisabled}
-                type="primary"
+                color="primary"
+                variant="link"
                 size="small"
                 onClick={() => saveSysPrompt()}
               >
@@ -357,15 +433,16 @@ const AIAgentUI = () => {
               style={{ maxHeight: "180px" }}
               dataSource={tools}
               renderItem={(tool) => (
-                <List.Item actions={[
-                  <Button
-                          type="primary"
-                          size="small"
-                          onClick={() => removeTool(tool)}
-                        >
-                          delete
-                        </Button>
-                ]} >
+                <List.Item
+                  actions={[
+                    <Button
+                      color="danger" variant="outlined"
+                      icon={<DeleteOutlined />}
+                      size="small"
+                      onClick={() => removeTool(tool)}
+                    ></Button>,
+                  ]}
+                >
                   {tool.type} : {getFuncParamsString(tool)}
                 </List.Item>
               )}
@@ -407,12 +484,12 @@ const AIAgentUI = () => {
                               (t) => t.function.name === tool.function.name
                             ) > -1
                           }
-                          type="primary"
+                          color="primary"
+                          variant="outlined"
+                          icon={<PlusOutlined />}
                           size="small"
                           onClick={() => handleToolSelect(tool)}
-                        >
-                          Add
-                        </Button>,
+                        ></Button>,
                       ]}
                     >
                       {tool.type} : {getFuncParamsString(tool)}
@@ -468,6 +545,7 @@ const AIAgentUI = () => {
           {streamingData ? (
             <>
               <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
                 components={{
                   pre: PreBlock,
                   code: CodeBlock,
@@ -478,6 +556,7 @@ const AIAgentUI = () => {
           ) : responseData ? (
             <>
               <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
                 components={{
                   code: PreBlock,
                 }}

@@ -6,6 +6,7 @@ type ToolsHookReturnType = {
   errorMessage: any;
   tools: Tool[];
   saveTool: (tool: Tool) => void;
+  saveToolImport: (tools:Tool[]) => void;
 };
 
 export const useTools = (): ToolsHookReturnType => {
@@ -28,5 +29,13 @@ export const useTools = (): ToolsHookReturnType => {
     setTools(updated);
     saveTools(updated);
   };
-  return { errorMessage, tools, saveTool };
+
+  const saveToolImport = (itools: Tool[]) => {
+    const inames = itools.map(i => i.function.name);
+    const filtered = tools.filter((t) => !inames.includes(t.function.name) );
+    const updated = [...filtered, ...itools];
+    setTools(updated);
+    saveTools(updated);
+  };
+  return { errorMessage, tools, saveTool, saveToolImport };
 };

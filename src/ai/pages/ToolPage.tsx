@@ -5,13 +5,19 @@ import {
   Button,
   Empty,
   notification,
+  Space,
 } from "antd";
+import {UploadOutlined, FileAddOutlined} from "@ant-design/icons"; 
 import ToolList from "./tools/ToolItem";
 import AddTool from "./tools/AddTool";
+import ImportToolPage from "./tools/import/ImportToolPage";
+import { Tool } from "../components/types/tool";
+import './tools.css'
 
 const ToolPage = () => {
-  const { tools, errorMessage, saveTool } = useTools();
+  const { tools, errorMessage, saveTool, saveToolImport } = useTools();
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isImportVisible, setIsImportVisible] = useState(false);
 
   React.useEffect(() => {
     if (errorMessage) {
@@ -26,19 +32,44 @@ const ToolPage = () => {
     setIsModalVisible(true);
   };
 
+  const saveImport = (tools:Tool[]) =>{
+    console.log(tools);
+    saveToolImport(tools);
+  }
+  const showImport = () => {
+    setIsImportVisible(true);
+  };
+
   if (errorMessage) {
     return <Empty description="No tools available" />;
   }
 
   return (
-    <div>
-      <Button
-        type="primary"
+    <div  className="system__Tools" style={{
+      height:"100%",
+      width:"100%",
+      overflowY:"auto",
+      padding:"10px"
+    }}>
+     <Space>
+     <Button
+        icon={<FileAddOutlined />}
         onClick={showModal}
         style={{ marginBottom: "16px" }}
       >
-        + Add Tool
+        Add Tool
       </Button>
+      <Button
+        icon={<UploadOutlined />}        
+        onClick={showImport}
+        style={{ marginBottom: "16px" }}
+      >
+        Import Tools
+      </Button>
+     </Space>
+      <ImportToolPage isModalVisible={isImportVisible}
+        setIsModalVisible={setIsImportVisible}
+        saveImport={saveImport} />
       <ToolList tools={tools} updateTool={saveTool} />
       <AddTool
         isModalVisible={isModalVisible}

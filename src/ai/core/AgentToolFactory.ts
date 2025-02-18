@@ -1,4 +1,4 @@
-import { WeatherFunction } from "./AgentToolFunction";
+import { DefaultFunction, WeatherFunction } from "./AgentToolFunction";
 
 export class AgentToolFactory {
   static getAgentToolInstance(id: string, toolName: string) {
@@ -11,6 +11,7 @@ export class AgentToolFactory {
         console.warn(
           "tool function Implementation not found, toolName : " + toolName
         );
+        return new DefaultFunction(id,toolName)
     }
   }
 }

@@ -28,3 +28,20 @@
 .copied{
     background-color: aliceblue;
 }
+.agent__result table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;    
+  }
+  
+  .agent__result th, .agent__result td {
+    border: 1px solid #ddd;
+      /* Light gray border */
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .agent__result th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+  }

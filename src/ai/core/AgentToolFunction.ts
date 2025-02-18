@@ -27,8 +27,29 @@ export class WeatherFunction implements AgentToolFunction {
       temperature: `${temperature} degree celsius`,
       location: params.location,
     };
-    console.log({toolName: this.toolName, params,content})
-    const response : AgentToolFunctionResponse = {
+    console.log({ toolName: this.toolName, params, content });
+    const response: AgentToolFunctionResponse = {
+      role: "tool",
+      tool_call_id: this.id,
+      content: JSON.stringify(content),
+    };
+    return response;
+  }
+}
+
+export class DefaultFunction implements AgentToolFunction {
+  static name: string = "DefaultFunction";
+  id: string;
+  toolName: string;
+  constructor(id: string, toolName: string) {
+    this.id = id;
+    this.toolName = toolName;
+  }
+  execute(params: any): AgentToolFunctionResponse {
+    const content = {
+      content: "unable to process the request, try again after sometime",
+    };
+    const response: AgentToolFunctionResponse = {
       role: "tool",
       tool_call_id: this.id,
       content: JSON.stringify(content),

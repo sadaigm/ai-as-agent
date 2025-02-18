@@ -1,0 +1,5 @@
+.system__tools .ant-card-body div{
+    height: 400px;
+    width: 100%;
+    overflow-y: clip;
+}
