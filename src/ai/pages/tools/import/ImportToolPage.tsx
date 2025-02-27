@@ -23,7 +23,7 @@ const ImportToolPage: React.FC<ImportToolProps> = ({
           const swaggerJson = JSON.parse(reader.result.toString());
             const host = swaggerJson.host||'localhost:8080';
             const basePath = swaggerJson.basePath || "/v1";
-            const schema = swaggerJson.schemes.find((s: string) =>s==="http")||"http";
+            const schema = swaggerJson.schemes?.find((s: string) =>s==="http")||"http";
             const hostPath = `${schema}://${host}${basePath}`
 
           const newTools = Object.keys(swaggerJson.paths).map((path, index) => {
@@ -36,7 +36,7 @@ const ImportToolPage: React.FC<ImportToolProps> = ({
             return {
               type: "rest",
               function: {
-                name: operation.operationId,
+                name: operation.summary,
                 description: operation.description,
                 parameters: getParameters(operation.parameters) || [],
               },
@@ -51,6 +51,7 @@ const ImportToolPage: React.FC<ImportToolProps> = ({
           setTools(newTools);
           message.success("Tools imported successfully");
         } catch (error) {
+          console.log(error);
           message.error("Failed to parse Swagger JSON");
         }
       }
@@ -111,7 +112,7 @@ const ImportToolPage: React.FC<ImportToolProps> = ({
 
 export default ImportToolPage;
 function getParameters(parameters: any): Parameter[] {
-  return parameters.map((p: any) => {
+  return parameters?.map((p: any) => {
     let typeValue = p['type'];
     let enumValue = p["enum"];
     if(typeValue === 'array'){
@@ -131,21 +132,21 @@ function getParameters(parameters: any): Parameter[] {
       enum: enumValue,
       required: p["required"],
     } as Parameter;
-  });
+  })||[];
 }
 
 function getQueryParams (parameters: any):string[]{
-    return parameters.map((p: any) => {
+    return parameters?.map((p: any) => {
         if(p.in && p.in ==="query"){
             return p.name;
         }
-    }).filter((p: string | undefined) => p);
+    }).filter((p: string | undefined) => p)||[];
 }
 
 function getBodyParams (parameters: any):string[]{
-    return parameters.map((p: any) => {
+    return parameters?.map((p: any) => {
         if(p.in && p.in ==="body"){
             return p.name;
         }
-    }).filter((p: string | undefined) => p);
+    }).filter((p: string | undefined) => p)||[];
 }
