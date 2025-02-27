@@ -1,0 +1,4 @@
+.import-tool-modal .ant-modal-body {
+  overflow-y: auto;
+  max-height: 900px;
+}

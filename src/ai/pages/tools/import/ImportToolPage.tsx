@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Upload, Button, message, Modal } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { Parameter, Tool } from "../../../components/types/tool";
+import "./import-tool.css";
 
 type ImportToolProps = {
   isModalVisible: boolean;
@@ -78,6 +79,7 @@ const ImportToolPage: React.FC<ImportToolProps> = ({
 
   return (
     <Modal
+    className="import-tool-modal"
       title="Add New Tool"
       visible={isModalVisible}
       onOk={handleAddTool}
