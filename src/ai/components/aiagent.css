@@ -12,6 +12,13 @@
     overflow-y: auto;
     max-height: calc( 100vh - 250px);
 }
+
+.thinking .ant-collapse-content {
+  height: calc(60% - 30px);
+  padding: 10px;
+  overflow-y: auto;
+  max-height: calc( 80vh - 250px);
+}
 .agent__result .ant-card-body pre {
     border: 1px solid #dce3e7;
     background-color: #cad4d854;
