@@ -4,6 +4,7 @@ import { Parameter, Tool } from "./ToolItem";
 import { ChatPayload } from "../../components/types/tool";
 import { useSubmitHandler } from "../../hooks/useSubmitHandler";
 import ParameterList from "./ParameterList";
+import { parseResponse } from "../../components/response/response-utils";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -37,7 +38,7 @@ const EditTool: FC<EditToolProps> = ({
 
   const [loading, setLoading] = useState(false);
   const [responseData, setResponseData] = useState<string | null>(null);
-  const [streamingData, setStreamingData] = useState("");
+  const [streamingData, setStreamingData] = useState<string | null>("");
   const [abortController, setAbortController] =
     useState<AbortController | null>(null);
 
@@ -63,7 +64,7 @@ const EditTool: FC<EditToolProps> = ({
         { role: "system", content: "You are a Document writer." },
         {
           role: "user",
-          content: `write a single line tool description for the toolname: ${toolName} so the user will understand what the tool does. ${paramString}`,
+          content: `write a single line tool description for the toolname: ${toolName} so the user will understand what the tool does. ${paramString}. return only the description in simple text don't add any other information `,
         },
       ],
       temperature: 0.8,
@@ -73,10 +74,14 @@ const EditTool: FC<EditToolProps> = ({
   };
 
   useEffect(() => {
-    if (responseData && responseData !== null) {
-      const strippedDescription = responseData.replace(/^"|"$/g, "");
-      console.log("Tool Description: ", strippedDescription);
-      form.setFieldsValue({ function: { description: strippedDescription } });
+    if (responseData && responseData !== null) {  
+      const { parsedResponse } = parseResponse(responseData);
+      if(parsedResponse){
+        const strippedDescription = parsedResponse.replace(/^"|"$/g, "");
+        console.log("Tool Description: ", strippedDescription);
+        form.setFieldsValue({ function: { description: strippedDescription } });
+      }
+      
     }
   }, [responseData]);
 
