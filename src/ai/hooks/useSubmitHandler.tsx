@@ -6,7 +6,7 @@ import { handleNonStreamResponse } from "../utils/response-utils";
 interface SubmitHandlerParams {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setResponseData: React.Dispatch<React.SetStateAction<any>>;
-  setStreamingData: React.Dispatch<React.SetStateAction<string>>;
+  setStreamingData: React.Dispatch<React.SetStateAction<string|null>>;
   setAbortController: React.Dispatch<
     React.SetStateAction<AbortController | null>
   >;

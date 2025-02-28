@@ -44,6 +44,7 @@ import { useSubmitHandler } from "../hooks/useSubmitHandler";
 import { useModels } from "../hooks/useModels";
 import { AgentToolFunctionResponse } from "../core/AgentToolFunction";
 import { getFullPrompt } from "../const";
+import ResponsePanel from "./response/ResponsePanel";
 
 const { TextArea } = Input;
 
@@ -55,8 +56,8 @@ const AIAgentUI = () => {
   const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [responseData, setResponseData] = useState(null);
-  const [streamingData, setStreamingData] = useState("");
+  const [responseData, setResponseData] = useState<string|null>(null);
+  const [streamingData, setStreamingData] = useState<string|null>("");
   const { models } = useModels();
   const [sysPromptDisabled, setsysPromptDisabled] = useState(true);
   const [sysPromptData, setsysPromptData] = useState<SystemRolePrompt>(
@@ -524,49 +525,8 @@ const AIAgentUI = () => {
           flexDirection: "column",
         }}
       >
-        <Card
-          className="agent__result"
-          title="Result"
-          bordered={false}
-          style={{ flex: 1 }}
-          extra={
-            <Space>
-              <Button
-                onClick={() => {
-                  setResponseData(null);
-                  setStreamingData("");
-                }}
-              >
-                Clear
-              </Button>
-            </Space>
-          }
-        >
-          {streamingData ? (
-            <>
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                components={{
-                  pre: PreBlock,
-                  code: CodeBlock,
-                }}
-                children={streamingData}
-              />
-            </>
-          ) : responseData ? (
-            <>
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                components={{
-                  code: PreBlock,
-                }}
-                children={responseData}
-              />
-            </>
-          ) : (
-            <Empty />
-          )}
-        </Card>
+        <ResponsePanel responseData={responseData} streamingData={streamingData} 
+        setResponseData={setResponseData} setStreamingData={setStreamingData} />
       </Col>
     </Row>
   );
