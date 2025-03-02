@@ -5,7 +5,7 @@ export type AgentToolFunctionResponse = {
 };
 
 export interface AgentToolFunction {
-  execute(params: any): AgentToolFunctionResponse;
+  execute(params: any): Promise<AgentToolFunctionResponse>;
 }
 
 export class WeatherFunction implements AgentToolFunction {
@@ -17,7 +17,7 @@ export class WeatherFunction implements AgentToolFunction {
     this.toolName = toolName;
   }
 
-  execute(params: any): AgentToolFunctionResponse {
+  execute(params: any): Promise<AgentToolFunctionResponse> {
     console.log(
       `executing instance ${WeatherFunction.name} ${this.id} with toolName: ${this.toolName}`,
       { params }
@@ -28,12 +28,16 @@ export class WeatherFunction implements AgentToolFunction {
       location: params.location,
     };
     console.log({ toolName: this.toolName, params, content });
-    const response: AgentToolFunctionResponse = {
-      role: "tool",
-      tool_call_id: this.id,
-      content: JSON.stringify(content),
-    };
-    return response;
+    const promise = new Promise<AgentToolFunctionResponse>((r, resolve) => {
+      const response: AgentToolFunctionResponse = {
+        role: "tool",
+        tool_call_id: this.id,
+        content: JSON.stringify(content),
+      };
+      resolve(response);
+    });
+
+    return promise;
   }
 }
 
@@ -45,15 +49,19 @@ export class DefaultFunction implements AgentToolFunction {
     this.id = id;
     this.toolName = toolName;
   }
-  execute(params: any): AgentToolFunctionResponse {
+  execute(params: any): Promise<AgentToolFunctionResponse> {
     const content = {
       content: "unable to process the request, try again after sometime",
     };
-    const response: AgentToolFunctionResponse = {
-      role: "tool",
-      tool_call_id: this.id,
-      content: JSON.stringify(content),
-    };
-    return response;
+    const promise = new Promise<AgentToolFunctionResponse>((r, resolve) => {
+      const response: AgentToolFunctionResponse = {
+        role: "tool",
+        tool_call_id: this.id,
+        content: JSON.stringify(content),
+      };
+      resolve(response);
+    });
+
+    return promise;
   }
 }

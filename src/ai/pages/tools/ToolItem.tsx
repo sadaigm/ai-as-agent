@@ -35,7 +35,7 @@ const ToolItem: React.FC<ToolItemProps> = ({ tool, onEdit }) => {
   return (
     <Card
       className="tool__item"
-      title={`Tool Name: ${tool.type}`}
+      title={`${tool.type.charAt(0).toUpperCase()}: ${tool.function.name}`}
       style={{
         marginBottom: "16px",
         height: "350px",
@@ -44,7 +44,7 @@ const ToolItem: React.FC<ToolItemProps> = ({ tool, onEdit }) => {
       extra={<Button icon={<EditOutlined />} onClick={onEdit}>Edit</Button>}
     >
       <p>
-        <strong>Function Name:</strong> {tool.function.name}
+        <strong>{tool.method} :</strong> {tool.url}
       </p>
       <p>
         <strong>Description:</strong> {tool.function.description}
