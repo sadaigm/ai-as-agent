@@ -50,6 +50,10 @@ export class DefaultFunction implements AgentToolFunction {
     this.toolName = toolName;
   }
   execute(params: any): Promise<AgentToolFunctionResponse> {
+    console.log(
+      `executing instance ${DefaultFunction.name} ${this.id} with toolName: ${this.toolName}`,
+      { params }
+    );
     const content = {
       content: "unable to process the request, try again after sometime",
     };
