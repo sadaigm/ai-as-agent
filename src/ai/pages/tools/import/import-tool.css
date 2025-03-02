@@ -2,3 +2,34 @@
   overflow-y: auto;
   max-height: 900px;
 }
+.import-tool-modal {
+  .ant-upload {
+    margin-bottom: 16px;
+  }
+
+  .tool-list {
+    width: 100%;
+    
+  }
+
+  .tool-list .ant-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .tool-list .ant-checkbox-wrapper {
+    width: 100%;
+    display: block;
+  }
+
+  .tool-list .ant-checkbox-wrapper .ant-checkbox {
+    margin-right: 8px;
+  }
+
+  .tool-list .ant-checkbox-wrapper .ant-list-item-meta {
+    width: 100%;
+  }
+}
