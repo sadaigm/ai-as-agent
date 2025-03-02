@@ -59,7 +59,7 @@ class ToolCallManager {
         toolInstance
       );
       if (agentToolInstance) {
-        const params = JSON.parse(args);
+        const params = args && args!==""?JSON.parse(args):{};
         const toolResponse: Promise<AgentToolFunctionResponse> =
           agentToolInstance.execute(params);
         if (toolResponse) {

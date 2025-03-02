@@ -95,6 +95,7 @@ export const useSubmitHandler = ({
         handleNonStreamResponse(response, payload).then((data) => {
           if (data) {
             setResponseData(data);
+            setLoading(false);
           }
         });
         // Promise.resolve();
@@ -105,7 +106,6 @@ export const useSubmitHandler = ({
       } else {
         message.error(`Error: ${error.message}`);
       }
-    } finally {
       setLoading(false);
     }
   };
