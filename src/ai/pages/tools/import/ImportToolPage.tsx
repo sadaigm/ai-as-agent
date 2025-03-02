@@ -29,7 +29,7 @@ const ImportToolPage: React.FC<ImportToolProps> = ({
           const schema = swaggerJson.schemes?.find((s: string) => s === "http") || "http";
           const hostPath = `${schema}://${host}${basePath}`;
 
-          const newTools = Object.keys(swaggerJson.paths).map((path, index) => {
+          const newTools = Object.keys(swaggerJson.paths).map((path) => {
             const pathItem = swaggerJson.paths[path];
             if (!Object.keys(pathItem).includes("get")) {
               return;

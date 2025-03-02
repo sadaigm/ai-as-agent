@@ -5,7 +5,6 @@ import {
   Button,
   Empty,
   Collapse,
-  Progress,
   CollapseProps,
   theme,
 } from "antd";
@@ -15,7 +14,6 @@ import remarkGfm from "remark-gfm";
 import "./response.css";
 import { parseResponse } from "./response-utils";
 
-const { Panel } = Collapse;
 
 interface ResponseProps {
   responseData: string | null;
@@ -108,9 +106,6 @@ const ResponsePanel: React.FC<ResponseProps> = ({
       });
     }
     return items;
-  };
-  const onChange = (key: string | string[]) => {
-    console.log(key);
   };
 
   const panelStyle: React.CSSProperties = {

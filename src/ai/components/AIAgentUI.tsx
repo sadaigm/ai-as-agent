@@ -15,7 +15,6 @@ import {
   Col,
   Card,
   Space,
-  Empty,
 } from "antd";
 import {
   SearchOutlined,
@@ -37,9 +36,6 @@ import {
   UserMessage,
   convertTools2AgentTools,
 } from "./types/tool";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import CodeBlock, { PreBlock } from "./response/CodeBlock";
 import { useSubmitHandler } from "../hooks/useSubmitHandler";
 import { useModels } from "../hooks/useModels";
 import { AgentToolFunctionResponse } from "../core/AgentToolFunction";
