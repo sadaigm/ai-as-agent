@@ -37,67 +37,42 @@ export const useSubmitHandler = ({
     //   temperature: values.temperature,
     //   stream: values.stream,
     // };
-    if (payload.tools) {
-      payload.stream = false;
-    }
 
+    const isStream = payload.stream && !payload.tools;
     try {
-      const response = await chatService.invoke(payload, controller);
+      const response = await chatService.invoke({...payload,stream: isStream}, controller);
 
       if (!response.ok) {
         throw new Error("Failed to send request");
       }
 
-      if (payload.stream) {
-        const reader = response.body?.getReader();
-        const decoder = new TextDecoder();
-        let done = false;
-        let text = "";
-
-        while (!done) {
-          const { value, done: readerDone } = (await reader?.read()) || {};
-          done = readerDone || false;
-
-          if (controller.signal.aborted) {
-            break;
-          }
-
-          if (value) {
-            text += decoder.decode(value, { stream: true });
-
-            const chunks = text.split("data: ");
-            let chunk = chunks[1];
-
-            if (chunk.trim()) {
-              try {
-                const formattedJSON = JSON.parse(chunk);
-
-                if (
-                  formattedJSON?.choices &&
-                  formattedJSON.choices[0]?.delta?.content
-                ) {
-                  setStreamingData(
-                    (prevData) =>
-                      prevData + formattedJSON.choices[0].delta.content
-                  );
-                }
-              } catch (error) {
-                console.log("Waiting for valid JSON...");
-              }
+      if (payload.stream && !payload.tools) {
+        handleStreamResponse(response, controller, setStreamingData,setLoading);
+      }
+      else if(payload.tools && payload.tools.length > 0){
+        handleNonStreamResponse(response, payload, payload.stream, controller).then((data) => {
+          if (data instanceof Response) {
+            if(payload.stream ){
+              handleStreamResponse(data, controller, setStreamingData,setLoading);
             }
-
-            text = chunks[chunks.length - 1];
-          }
-        }
-
-        message.success("Streaming completed");
-      } else {
-        handleNonStreamResponse(response, payload).then((data) => {
-          if (data) {
-            setResponseData(data);
+            else{
+              handleNonStreamResponse(data, payload, false, controller).then((data) => {
+                if (data) {
+                  setResponseData(data);
+                  setLoading(false);
+                }
+              });
+            }
           }
         });
-        // Promise.resolve();
+      }
+      else {
+        handleNonStreamResponse(response, payload, false, controller).then((data) => {
+          if (data) {
+            setResponseData(data);
+            setLoading(false);
+          }
+        });
       }
     } catch (error: any) {
       if (error.name === "AbortError") {
@@ -105,10 +80,52 @@ export const useSubmitHandler = ({
       } else {
         message.error(`Error: ${error.message}`);
       }
-    } finally {
       setLoading(false);
     }
   };
 
   return handleSubmit;
 };
+async function handleStreamResponse(response: Response, controller: AbortController, setStreamingData: React.Dispatch<React.SetStateAction<string|null>>,setLoading: React.Dispatch<React.SetStateAction<boolean>>) {
+  const reader = response.body?.getReader();
+  const decoder = new TextDecoder();
+  let done = false;
+  let text = "";
+
+  while (!done) {
+    const { value, done: readerDone } = (await reader?.read()) || {};
+    done = readerDone || false;
+
+    if (controller.signal.aborted) {
+      break;
+    }
+
+    if (value) {
+      text += decoder.decode(value, { stream: true });
+
+      const chunks = text.split("data: ");
+      let chunk = chunks[1];
+
+      if (chunk.trim()) {
+        try {
+          const formattedJSON = JSON.parse(chunk);
+
+          if (formattedJSON?.choices &&
+            formattedJSON.choices[0]?.delta?.content) {
+            setStreamingData(
+              (prevData) => prevData + formattedJSON.choices[0].delta.content
+            );
+          }
+        } catch (error) {
+          console.log("Waiting for valid JSON...");
+        }
+      }
+
+      text = chunks[chunks.length - 1];
+    }
+  }
+
+  message.success("Streaming completed");
+  setLoading(false);
+}
+

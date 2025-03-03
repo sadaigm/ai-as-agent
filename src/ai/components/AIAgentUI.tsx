@@ -63,6 +63,7 @@ const AIAgentUI = () => {
   const [availableTools, setAvailableTools] = React.useState<Tool[]>([]);
   const [allTools, setAllTools] = React.useState<Tool[]>([]);
   const [chatHistory, setchatHistory] = useState<ChatHistory>({});
+  const [useConversation, setUseConversation] = useState(false); // New state for checkbox
 
   const [conversation, setConversation] = useState<
     Array<UserMessage | ToolMessage | AgentToolFunctionResponse>
@@ -113,8 +114,6 @@ const AIAgentUI = () => {
   const executeChatService = (values: any) => {
     const aiReplies = conversation.filter((c) => c.role === "assistant");
     console.log("debug", aiReplies);
-    // const updated = [...lastAIResponse, { role: "user", content: values.userPrompt }]
-    //   setConversation(updated);
     const updated = [
       ...conversation,
       { role: "user", content: values.userPrompt },
@@ -125,7 +124,7 @@ const AIAgentUI = () => {
       model: values.model,
       messages: [
         { role: "system", content: getFullPrompt(values.systemPrompt) },
-        ...aiReplies,
+        ...(useConversation ? aiReplies : []), // Include aiReplies if checkbox is checked
         { role: "user", content: values.userPrompt },
       ],
       temperature: values.temperature,
@@ -133,7 +132,6 @@ const AIAgentUI = () => {
     };
     if (values.tools) {
       payload.tools = values.tools;
-      payload.stream = false;
     }
     handleSubmit(payload);
   };
@@ -225,6 +223,10 @@ const AIAgentUI = () => {
             temperature: 0.8, // Set initial temperature to 0.8
             stream: true, // Set initial stream to true
           }}
+          onValuesChange={(changedValues, allValues) => {
+            console.log({ changedValues, allValues });
+            setConversation([]);
+          }}
           layout="vertical"
         >
           <Card
@@ -234,10 +236,15 @@ const AIAgentUI = () => {
             style={{ flex: 1 }}
             extra={
               <Space>
+                <Checkbox
+                  checked={useConversation}
+                  onChange={(e) => setUseConversation(e.target.checked)}
+                >
+                  Use Conversation
+                </Checkbox>
                 <Button 
                 color={'primary'}
                 variant="outlined"
-
                 htmlType="submit" loading={loading}>
                   Submit
                 </Button>
