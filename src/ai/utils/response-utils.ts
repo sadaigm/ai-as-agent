@@ -3,7 +3,9 @@ import ToolCallManager from "../core/ToolCallManager";
 
 export async function handleNonStreamResponse(
   response: Response,
-  payload: ChatPayload
+  payload: ChatPayload,
+  toolStream: boolean,
+  controller: AbortController
 ) {
   const data = await response.json();
   if (
@@ -12,7 +14,9 @@ export async function handleNonStreamResponse(
     data.choices[0]?.message?.content &&
     data.choices[0]?.message?.role === "assistant"
   ) {
-    return data.choices[0]?.message?.content;
+    return new Promise((resolve) => {
+      resolve(data.choices[0]?.message?.content);
+    });
   } else if (
     data?.choices &&
     data.choices[0].finish_reason === "tool_calls" &&
@@ -24,7 +28,7 @@ export async function handleNonStreamResponse(
     console.log("reveived tool_calls from agent", toolCalls, data);
     const toolManager = new ToolCallManager(payload, toolCalls);
     console.log("invoking ToolCallManager to interceptToolCalls");
-    const result: any = await toolManager.interceptToolCalls();
+    const result = await toolManager.interceptToolCalls(toolStream,controller);
     console.log("interceptToolCalls : done");
     return result;
   }

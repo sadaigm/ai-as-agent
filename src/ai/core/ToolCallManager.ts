@@ -29,7 +29,7 @@ class ToolCallManager {
     return this.tools.find((tool) => tool.function.name === name);
   }
 
-  async interceptToolCalls() {
+  async interceptToolCalls(toolStream: boolean, controller: AbortController) {
     await this.initializeTools();
     const toolResponses = await Promise.all(
       this.toolCalls
@@ -43,7 +43,7 @@ class ToolCallManager {
     );
     // invoke agent callback
     // I think the list of promise need to resolve here
-    return await this.callBackToAgent(this.toolCalls, toolResponses as []);
+    return await this.callBackToAgent(this.toolCalls, toolResponses as [], toolStream, controller);
   }
 
   interceptToolCall(toolCall: ToolCall, toolInstance: Tool | undefined) {
@@ -71,9 +71,11 @@ class ToolCallManager {
 
   async callBackToAgent(
     toolCalls: ToolCall[],
-    toolResponses: AgentToolFunctionResponse[]
+    toolResponses: AgentToolFunctionResponse[],
+    toolStream: boolean,
+    controller: AbortController
   ) {
-    const agentRequest = { ...this.payload, stream: true };
+    const agentRequest = { ...this.payload, stream: toolStream };
     delete agentRequest["tools"];
     //
     const toolMessage: ToolMessage = {
@@ -82,15 +84,16 @@ class ToolCallManager {
     };
     agentRequest.messages.push(toolMessage);
     toolResponses.forEach((res) => agentRequest.messages.push(res));
-    agentRequest.stream = false;
+    agentRequest.stream = toolStream;
     const response = await this.chatInstance.invoke(
       agentRequest,
-      new AbortController()
+      controller
     );
     if (!response.ok) {
       throw new Error("Failed to send request");
     }
-    return await handleNonStreamResponse(response, this.payload);
+    // return await handleNonStreamResponse(response, this.payload, toolStream);
+    return response
   }
 }
 

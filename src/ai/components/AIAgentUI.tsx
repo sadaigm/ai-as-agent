@@ -133,7 +133,7 @@ const AIAgentUI = () => {
     };
     if (values.tools) {
       payload.tools = values.tools;
-      payload.stream = false;
+      // payload.stream = false;
     }
     handleSubmit(payload);
   };
@@ -224,6 +224,10 @@ const AIAgentUI = () => {
           initialValues={{
             temperature: 0.8, // Set initial temperature to 0.8
             stream: true, // Set initial stream to true
+          }}
+          onValuesChange={(changedValues, allValues) => {
+            console.log({ changedValues, allValues });
+            setConversation([]);
           }}
           layout="vertical"
         >
