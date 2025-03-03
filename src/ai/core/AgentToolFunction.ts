@@ -28,7 +28,7 @@ export class WeatherFunction implements AgentToolFunction {
       location: params.location,
     };
     console.log({ toolName: this.toolName, params, content });
-    const promise = new Promise<AgentToolFunctionResponse>((r, resolve) => {
+    const promise = new Promise<AgentToolFunctionResponse>((resolve) => {
       const response: AgentToolFunctionResponse = {
         role: "tool",
         tool_call_id: this.id,
