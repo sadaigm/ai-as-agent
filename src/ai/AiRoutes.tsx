@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-import AIAgentUI from "./components/AIAgentUI";
+import AIAgentUI from "./components/agent-ui/AIAgentUI";
 import ToolPage from "./pages/ToolPage";
 import SystemRolePage from "./pages/SystemRolePage";
 

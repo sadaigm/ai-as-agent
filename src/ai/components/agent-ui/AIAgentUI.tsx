@@ -8,10 +8,10 @@ import {
   ChatHistory,
   ToolMessage,
   UserMessage,  
-} from "./types/tool";
-import ResponsePanel from "./response/ResponsePanel";
+} from "../types/tool";
+import ResponsePanel from "../response/ResponsePanel";
 import FormSection from "./FormSection";
-import { AgentToolFunctionResponse } from "../core/AgentToolFunction";
+import { AgentToolFunctionResponse } from "../../core/AgentToolFunction";
 
 const AIAgentUI = () => {
   const [loading, setLoading] = useState(false);
