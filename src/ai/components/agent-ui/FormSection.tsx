@@ -22,8 +22,8 @@ import {
 import {
   getSystemPromptTemplates as getRoleSystemPromptTemplates,
   getTools,
-} from "../utils/service";
-import { getFuncParamsString } from "../utils/function";
+} from "../../utils/service";
+import { getFuncParamsString } from "../../utils/function";
 import {
   ChatHistory,
   SystemRolePrompt,
@@ -32,11 +32,11 @@ import {
   ToolMessage,
   convertTools2AgentTools,
   ChatPayload,
-} from "./types/tool";
-import { useSubmitHandler } from "../hooks/useSubmitHandler";
-import { useModels } from "../hooks/useModels";
-import { getFullPrompt } from "../const";
-import { AgentToolFunctionResponse } from "../core/AgentToolFunction";
+} from "../types/tool";
+import { useSubmitHandler } from "../../hooks/useSubmitHandler";
+import { useModels } from "../../hooks/useModels";
+import { getFullPrompt } from "../../const";
+import { AgentToolFunctionResponse } from "../../core/AgentToolFunction";
 
 const { TextArea } = Input;
 
