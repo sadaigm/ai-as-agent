@@ -51,7 +51,7 @@ const AddSystemRole: FC<AddRoleModalProps> = ({
             content: `Write a role descrtion for the Role:  ${currentRoleName}, consider what unique skills this position demands. 
             Reflect on the latest tools and technologies relevant to the field. Identify key professional experiences that align with the role's challenges. 
             Emphasize soft skills that enhance teamwork and communication. Lastly, pinpoint the core responsibilities and expected outcomes that define success in this position.
-            Could you please provide the following details in 5 lines`,
+            Could you please provide the Summary/Description in 5 lines`,
           },
         ],
         temperature: 0.8,
@@ -141,7 +141,7 @@ const AddSystemRole: FC<AddRoleModalProps> = ({
             { required: true, message: "Please input the system prompt!" },
           ]}
         >
-          <TextArea rows={4} placeholder="Enter system prompt" />
+          <TextArea rows={7} placeholder="Enter system prompt" />
         </Form.Item>
       </Form>
     </Modal>

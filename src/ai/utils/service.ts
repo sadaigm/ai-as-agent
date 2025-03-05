@@ -2,8 +2,8 @@ import { SystemRolePrompt, Tool } from "../components/types/tool";
 
 export const AI_TOOLS_KEY = "aitools";
 export const AI_ROLES_KEY = "aisysprompts";
+
 export const getTools = (): Promise<Tool[]> => {
-  
   const data = localStorage.getItem(AI_TOOLS_KEY);
   if (data) {
     return Promise.resolve(JSON.parse(data) as Tool[]);
@@ -25,5 +25,14 @@ export const saveTools = (tools: Tool[]) => {
 
 export const saveSystemPromptTemplates = (systemRolePrompts: SystemRolePrompt[]) => {
   localStorage.setItem(AI_ROLES_KEY, JSON.stringify(systemRolePrompts));
+};
+
+export const deleteSystemPromptTemplate = (id: string) => {
+  const data = localStorage.getItem(AI_ROLES_KEY);
+  if (data) {
+    const systemRolePrompts = JSON.parse(data) as SystemRolePrompt[];
+    const updatedPrompts = systemRolePrompts.filter(prompt => prompt.id !== id);
+    localStorage.setItem(AI_ROLES_KEY, JSON.stringify(updatedPrompts));
+  }
 };
 

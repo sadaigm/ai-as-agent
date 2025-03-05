@@ -8,7 +8,7 @@ import "./role.css";
 import { UserAddOutlined } from "@ant-design/icons";
 
 const SystemRolePage = () => {
-  const { errorMessage, systemRolePrompts, saveSystemRolePrompt } = useSystemRole();
+  const { errorMessage, systemRolePrompts, saveSystemRolePrompt, deleteSystemRolePrompt } = useSystemRole();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingRole, setEditingRole] = useState<SystemRolePrompt | null>(null);
 
@@ -19,6 +19,10 @@ const SystemRolePage = () => {
   const handleEdit = (role: SystemRolePrompt) => {
     setEditingRole(role);
     setIsModalVisible(true);
+  };
+
+  const handleDelete = (id: string) => {
+    deleteSystemRolePrompt(id);
   };
 
   React.useEffect(() => {
@@ -49,7 +53,7 @@ const SystemRolePage = () => {
       >
         Add Role
       </Button>
-      <SystemRoleList systemRolePrompts={systemRolePrompts} onEdit={handleEdit} />
+      <SystemRoleList systemRolePrompts={systemRolePrompts} onEdit={handleEdit} onDelete={handleDelete} />
       <AddSystemRole
         isModalVisible={isModalVisible}
         setIsModalVisible={setIsModalVisible}
