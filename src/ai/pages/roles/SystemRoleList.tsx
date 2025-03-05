@@ -1,7 +1,8 @@
 import React from "react";
 import { Card, Row, Col, Button, Modal } from "antd";
 import { SystemRolePrompt } from "../../components/types/tool";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, UserOutlined } from "@ant-design/icons";
+import { getRandomColor } from "../../utils/ui-utils";
 
 interface SystemRolePromptCardProps {
   systemRolePrompt: SystemRolePrompt;
@@ -16,7 +17,15 @@ const SystemRolePromptCard: React.FC<SystemRolePromptCardProps> = ({
 }) => {
   return (
     <Card
-      title={`Role: ${systemRolePrompt.systemRole}`}
+      title={<span>
+        <UserOutlined style={{color: getRandomColor()||"#2196f3"}} />
+        <strong style={{
+          textTransform: "capitalize",
+          marginLeft: "8px",
+        }} >
+          {`${systemRolePrompt.systemRole}`}
+        </strong>
+      </span>}
       style={{ marginBottom: "16px" }}
       extra={
         <>
