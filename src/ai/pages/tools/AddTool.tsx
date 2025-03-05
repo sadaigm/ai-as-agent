@@ -25,7 +25,7 @@ const AddTool: FC<AddToolProps> = ({
 
   const [loading, setLoading] = useState(false);
   const [responseData, setResponseData] = useState<string | null>(null);
-  const [streamingData, setStreamingData] = useState("");
+  const [streamingData, setStreamingData] = useState<string | null>("");
   const [abortController, setAbortController] =
     useState<AbortController | null>(null);
 

@@ -3,13 +3,21 @@ import { useSystemRole } from "../hooks/useSystemRole";
 import SystemRoleList from "./roles/SystemRoleList";
 import { Button, Empty, notification } from "antd";
 import AddSystemRole from "./roles/AddSystemRole";
+import { SystemRolePrompt } from "../components/types/tool";
 import "./role.css";
+import { UserAddOutlined } from "@ant-design/icons";
 
 const SystemRolePage = () => {
   const { errorMessage, systemRolePrompts, saveSystemRolePrompt } = useSystemRole();
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editingRole, setEditingRole] = useState<SystemRolePrompt | null>(null);
 
   const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleEdit = (role: SystemRolePrompt) => {
+    setEditingRole(role);
     setIsModalVisible(true);
   };
 
@@ -34,17 +42,20 @@ const SystemRolePage = () => {
       padding:"10px"
     }}>
       <Button
-        type="primary"
+        // type="primary"
         onClick={showModal}
         style={{ marginBottom: "16px" }}
+        icon={<UserAddOutlined />}
       >
-        + Add System Role
+        Add Role
       </Button>
-      <SystemRoleList systemRolePrompts={systemRolePrompts} />
+      <SystemRoleList systemRolePrompts={systemRolePrompts} onEdit={handleEdit} />
       <AddSystemRole
         isModalVisible={isModalVisible}
         setIsModalVisible={setIsModalVisible}
         saveSystemRolePrompt={saveSystemRolePrompt}
+        editingRole={editingRole}
+        setEditingRole={setEditingRole}
       />
     </div>
   );
