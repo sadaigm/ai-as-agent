@@ -265,7 +265,7 @@ const FormSection: React.FC<FormSectionProps> = ({
           <Select
             style={{ width: "50%" }}
             placeholder="Select a Role"
-            onSelect={(value) => {
+            onChange={(value) => {
               console.log(value);
               if (sysPromptData.systemRole) {
                 setchatHistory((prev) => {
@@ -277,7 +277,7 @@ const FormSection: React.FC<FormSectionProps> = ({
               }
 
               if (value !== "new_role") {
-                const data = sysPromptList.find((r) => r.id === value);
+                const data = sysPromptList.find((r) => `${r.id}` === `${value}`);
                 if (data) {
                   console.log({ data });
                   setsysPromptData(data);
@@ -300,22 +300,16 @@ const FormSection: React.FC<FormSectionProps> = ({
                 });
               }
             }}
+            options={sysPromptList.map((systemRolePrompt: SystemRolePrompt, index) => {
+              return {
+                value: `${systemRolePrompt.id}`,
+                label: `${systemRolePrompt.systemRole}`,
+              };
+            })}
             allowClear
             showSearch // Enable search functionality
             optionFilterProp="children" // This enables the search to filter based on option's text
-          >
-            <Select.Option key={`new_role`} value={"new_role"}>
-              {"New Role"}
-            </Select.Option>
-            {sysPromptList.map((systemRolePrompt: SystemRolePrompt) => (
-              <Select.Option
-                key={systemRolePrompt.id}
-                value={systemRolePrompt.id}
-              >
-                {systemRolePrompt.systemRole}
-              </Select.Option>
-            ))}
-          </Select>
+          />
         </Form.Item>
         <Form.Item
           label="AI Role"
