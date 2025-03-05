@@ -15,7 +15,7 @@ import { Tool } from "../components/types/tool";
 import './tools.css'
 
 const ToolPage = () => {
-  const { tools, errorMessage, saveTool, saveToolImport } = useTools();
+  const { tools, errorMessage, saveTool, saveToolImport, deleteTool } = useTools();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isImportVisible, setIsImportVisible] = useState(false);
 
@@ -70,7 +70,7 @@ const ToolPage = () => {
       <ImportToolPage isModalVisible={isImportVisible}
         setIsModalVisible={setIsImportVisible}
         saveImport={saveImport} />
-      <ToolList tools={tools} updateTool={saveTool} />
+      <ToolList tools={tools} updateTool={saveTool} deleteTool={deleteTool} />
       <AddTool
         isModalVisible={isModalVisible}
         setIsModalVisible={setIsModalVisible}
