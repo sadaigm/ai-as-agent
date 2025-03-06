@@ -62,6 +62,11 @@ const Ai = () => {
             onClick={onClick}
             items={[
               {
+                key: "playground-ai",
+                icon: <UserOutlined />,
+                label: "AI Playground",
+              },
+              {
                 key: "roles",
                 icon: <UserOutlined />,
                 label: "Ai Roles",
