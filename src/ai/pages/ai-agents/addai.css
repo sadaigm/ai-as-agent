@@ -1,0 +1,4 @@
+.fullmodel .ant-modal-body{
+  max-height: calc(100vh - 140px) !important;
+  height: calc(100vh - 140px) !important;
+}

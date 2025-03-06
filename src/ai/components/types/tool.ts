@@ -61,13 +61,14 @@ export type SystemMessage = UserMessage & {  };
 export type ToolMessage = { role: string, tool_calls: ToolCall[] };
 
 export interface AIAgent {
+  systemRoleTemplate: string;
   name: string;
   description: string;
   systemPrompt: string;
   model: string;
   temperature: Number;
   stream: boolean;
-  tools?: string[];
+  tools?: Tool[];
 }
 
 export interface ChatPayload {

@@ -37,17 +37,26 @@ import { useSubmitHandler } from "../../hooks/useSubmitHandler";
 import { useModels } from "../../hooks/useModels";
 import { getFullPrompt } from "../../const";
 import { AgentToolFunctionResponse } from "../../core/AgentToolFunction";
+import GetAIModel from "./getAIModel";
+import GetAIRoles from "./GetAIRoles";
+import GetAITools from "./GetAITools";
 
 const { TextArea } = Input;
 
 const ToolList = getTools();
 
 interface FormSectionProps {
-  setConversation: React.Dispatch<React.SetStateAction<Array<UserMessage | ToolMessage | AgentToolFunctionResponse>>>;
+  setConversation: React.Dispatch<
+    React.SetStateAction<
+      Array<UserMessage | ToolMessage | AgentToolFunctionResponse>
+    >
+  >;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setResponseData: React.Dispatch<React.SetStateAction<string | null>>;
   setStreamingData: React.Dispatch<React.SetStateAction<string | null>>;
-  setAbortController: React.Dispatch<React.SetStateAction<AbortController | null>>;
+  setAbortController: React.Dispatch<
+    React.SetStateAction<AbortController | null>
+  >;
   conversation: Array<UserMessage | ToolMessage | AgentToolFunctionResponse>;
   chatHistory: ChatHistory;
   setchatHistory: React.Dispatch<React.SetStateAction<ChatHistory>>;
@@ -126,12 +135,7 @@ const FormSection: React.FC<FormSectionProps> = ({
     handleSubmit(payload);
   };
 
-  const handleToolSelect = (tool: any) => {
-    setSelectedTool(tool);
-    setIsModalVisible(true);
-  };
-
-  const handleAddTool = () => {
+  const handleAddTool = (tool: Tool|null) => {
     if (selectedTool) {
       const updatedTools = [...tools, selectedTool];
       const agentTools = convertTools2AgentTools(updatedTools);
@@ -161,6 +165,11 @@ const FormSection: React.FC<FormSectionProps> = ({
     );
     message.info(`${tool.type}:${tool.function.name} removed from tools list`);
   };
+
+  const onToolChange = (tools: Tool[]) => {
+    const agentTools = convertTools2AgentTools(tools);
+    form.setFieldValue("tools", agentTools);
+  }
 
   const handleCancel = () => {
     if (abortController) {
@@ -220,14 +229,16 @@ const FormSection: React.FC<FormSectionProps> = ({
             >
               Use Conversation
             </Checkbox>
-            <Button 
-            color={'primary'}
-            variant="outlined"
-            htmlType="submit" loading={loading}>
+            <Button
+              color={"primary"}
+              variant="outlined"
+              htmlType="submit"
+              loading={loading}
+            >
               Submit
             </Button>
             <Button
-              color={'danger'}
+              color={"danger"}
               variant="outlined"
               onClick={handleCancel}
               disabled={!loading}
@@ -241,30 +252,15 @@ const FormSection: React.FC<FormSectionProps> = ({
           label="Model"
           name="model"
           rules={[{ required: true, message: "Please select a model" }]}
-        >
-          <Select
-            placeholder="Select a model"
-            onSelect={(value) => {
-              localStorage.setItem("selectedModel", value);
-            }}
-            allowClear
           >
-            {models.map((model: any) => (
-              <Select.Option key={model.id} value={model.id}>
-                {model.id}
-              </Select.Option>
-            ))}
-          </Select>
+          <GetAIModel onChange={(v) => {
+            console.log({ v });
+            form.setFieldValue("model", v);
+          }} />
         </Form.Item>
 
-        <Form.Item
-          label="Select AI Role"
-          name="systemRoleTemplate"
-          rules={[]}
-        >
-          <Select
-            style={{ width: "50%" }}
-            placeholder="Select a Role"
+        <Form.Item label="Select AI Role" name="systemRoleTemplate" rules={[]}>
+          <GetAIRoles
             onChange={(value) => {
               console.log(value);
               if (sysPromptData.systemRole) {
@@ -277,7 +273,9 @@ const FormSection: React.FC<FormSectionProps> = ({
               }
 
               if (value !== "new_role") {
-                const data = sysPromptList.find((r) => `${r.id}` === `${value}`);
+                const data = sysPromptList.find(
+                  (r) => `${r.id}` === `${value}`
+                );
                 if (data) {
                   console.log({ data });
                   setsysPromptData(data);
@@ -300,23 +298,12 @@ const FormSection: React.FC<FormSectionProps> = ({
                 });
               }
             }}
-            options={sysPromptList.map((systemRolePrompt: SystemRolePrompt, index) => {
-              return {
-                value: `${systemRolePrompt.id}`,
-                label: `${systemRolePrompt.systemRole}`,
-              };
-            })}
-            allowClear
-            showSearch // Enable search functionality
-            optionFilterProp="children" // This enables the search to filter based on option's text
           />
         </Form.Item>
         <Form.Item
           label="AI Role"
           name="systemRole"
-          rules={[
-            { required: true, message: "Please input AI system role" },
-          ]}
+          rules={[{ required: true, message: "Please input AI system role" }]}
         >
           <Input
             placeholder="Enter Role"
@@ -336,9 +323,7 @@ const FormSection: React.FC<FormSectionProps> = ({
           label="System Prompt"
           name="systemPrompt"
           initialValue={sysPromptData.systemPrompt || ""}
-          rules={[
-            { required: true, message: "Please input system prompt" },
-          ]}
+          rules={[{ required: true, message: "Please input system prompt" }]}
         >
           <TextArea
             placeholder="Enter system prompt"
@@ -377,9 +362,7 @@ const FormSection: React.FC<FormSectionProps> = ({
         <Form.Item
           label="Temperature"
           name="temperature"
-          rules={[
-            { required: true, message: "Please input a temperature" },
-          ]}
+          rules={[{ required: true, message: "Please input a temperature" }]}
         >
           <InputNumber
             min={0}
@@ -397,99 +380,18 @@ const FormSection: React.FC<FormSectionProps> = ({
 
         <Typography.Title level={4}>Selected Tools</Typography.Title>
 
-        <List
-          size="small"
-          bordered
-          pagination={{
-            onChange: (page) => {
-              console.log(page);
-            },
-            pageSize: 3,
-          }}
-          style={{ maxHeight: "180px" }}
-          dataSource={tools}
-          renderItem={(tool) => (
-            <List.Item
-              actions={[
-                <Button
-                  color="danger" variant="outlined"
-                  icon={<DeleteOutlined />}
-                  size="small"
-                  onClick={() => removeTool(tool)}
-                ></Button>,
-              ]}
-            >
-              {tool.type} : {getFuncParamsString(tool)}
-            </List.Item>
-          )}
-        />
+        
         <Form.Item label="Tools" name="tools">
-          <div>
-            <Input
-              placeholder="Search tools"
-              prefix={<SearchOutlined />}
-              onChange={(e) => {
-                console.log(e.target.value);
-                if (e.target.value) {
-                  const filtered = availableTools.filter((t) =>
-                    getFuncParamsString(t).includes(e.target.value)
-                  );
-                  setAvailableTools(filtered);
-                } else {
-                  setAvailableTools(allTools);
-                }
-              }}
-              style={{ width: "100%" }}
-            />
-            <List
-              pagination={{
-                onChange: (page) => {
-                  console.log(page);
-                },
-                pageSize: 3,
-              }}
-              style={{ maxHeight: "180px" }}
-              dataSource={availableTools}
-              bordered
-              renderItem={(tool) => (
-                <List.Item
-                  actions={[
-                    <Button
-                      disabled={
-                        tools.findIndex(
-                          (t) => t.function.name === tool.function.name
-                        ) > -1
-                      }
-                      color="primary"
-                      variant="outlined"
-                      icon={<PlusOutlined />}
-                      size="small"
-                      onClick={() => handleToolSelect(tool)}
-                    ></Button>,
-                  ]}
-                >
-                  {tool.type} : {getFuncParamsString(tool)}
-                </List.Item>
-              )}
-            />
-          </div>
+          {/* {GetAITools(tools, removeTool, availableTools, setAvailableTools, allTools, handleToolSelect)} */}
+
+          <GetAITools onChange={onToolChange} />
         </Form.Item>
       </Card>
-      <Modal
-        title="Add Tool"
-        visible={isModalVisible}
-        onOk={handleAddTool}
-        onCancel={() => setIsModalVisible(false)}
-        okText="Add Tool"
-        cancelText="Cancel"
-      >
-        <p>
-          Are you sure you want to add{" "}
-          <strong>{selectedTool?.function.name}</strong> to the current form?
-        </p>
-      </Modal>
+      
     </Form>
   );
 };
 
 export default FormSection;
+
+
