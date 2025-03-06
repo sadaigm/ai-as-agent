@@ -60,9 +60,19 @@ export type UserMessage = { role: string; content: any };
 export type SystemMessage = UserMessage & {  };
 export type ToolMessage = { role: string, tool_calls: ToolCall[] };
 
+export interface AIAgent {
+  name: string;
+  description: string;
+  systemPrompt: string;
+  model: string;
+  temperature: Number;
+  stream: boolean;
+  tools?: string[];
+}
+
 export interface ChatPayload {
   model: string;
-  messages: Array<UserMessage|ToolMessage| AgentToolFunctionResponse>;
+  messages: Array<UserMessage| SystemMessage |ToolMessage| AgentToolFunctionResponse>;
   temperature: Number;
   stream: boolean;
   tools?: AgentTool[];

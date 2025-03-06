@@ -1,0 +1,9 @@
+.ai__agent-list .ant-card-body{
+    overflow-y: auto;
+    height: calc(100% - 60px);
+    padding: 0;
+}
+.ai__agent-list .ai__agent-list-title{
+    display: flex;
+    justify-content: space-between;
+}
