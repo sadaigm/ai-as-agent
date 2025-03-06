@@ -10,51 +10,63 @@ import { Tool } from "../types/tool";
 import { getTools } from "../../utils/service";
 
 type GetAIToolsProps = {
-  onChange: (tools: Tool[])=>void;
+  onChange: (tools: Tool[]) => void;
   removeTool?: (tool: Tool) => void;
   handleAddTool?: (tool: Tool | null) => void;
+  defaultValue?: Tool[];
 };
 const ToolList = getTools();
 
-const GetAITools: FC<GetAIToolsProps> = ({ removeTool, handleAddTool, onChange }) => {
+const GetAITools: FC<GetAIToolsProps> = ({
+  removeTool,
+  handleAddTool,
+  onChange,
+  defaultValue,
+}) => {
   const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [tools, setTools] = useState<Tool[]>([]);
   const [availableTools, setAvailableTools] = useState<Tool[]>([]);
   const [allTools, setAllTools] = useState<Tool[]>([]);
+
+  useEffect(() => {
+    defaultValue && setTools(defaultValue);
+  }, [defaultValue]);
+
   const handleToolSelect = (tool: any) => {
     setSelectedTool(tool);
     setIsModalVisible(true);
   };
-  const handleRemove =(tool: Tool) => {
+  const handleRemove = (tool: Tool) => {
     const updatedTools = tools.filter(
-        (t) => t.function.name !== tool.function.name
-      );
-      removeTool && removeTool(tool);
+      (t) => t.function.name !== tool.function.name
+    );
+    console.log({updatedTools})
+    removeTool && removeTool(tool);
+    setTools(updatedTools);
+    onChange(updatedTools);
+    console.log(
+      { tool },
+      `${tool.type}:${tool.function.name} removed from tools list`
+    );
+    message.info(`${tool.type}:${tool.function.name} removed from tools list`);
+  };
+  const handleAdd = () => {
+    if (selectedTool) {
+      const updatedTools = [...tools, selectedTool];
+      console.log({updatedTools})
+      handleAddTool && handleAddTool(selectedTool);
       setTools(updatedTools);
       onChange(updatedTools);
-          console.log(
-            { tool },
-            `${tool.type}:${tool.function.name} removed from tools list`
-          );
-          message.info(`${tool.type}:${tool.function.name} removed from tools list`);
-  }
-  const handleAdd = () => {
-    if(selectedTool){
-        const updatedTools = [...tools, selectedTool];
-        handleAddTool && handleAddTool(selectedTool);
-        setTools(updatedTools);
-        onChange(updatedTools);
-          console.log(
-            { selectedTool },
-            `${selectedTool.type}:${selectedTool.function.name} added to tools list`
-          );
-          message.success(
-            `${selectedTool.type}:${selectedTool.function.name} added to tools list`
-          );
-          setIsModalVisible(false);
+      console.log(
+        { selectedTool },
+        `${selectedTool.type}:${selectedTool.function.name} added to tools list`
+      );
+      message.success(
+        `${selectedTool.type}:${selectedTool.function.name} added to tools list`
+      );
+      setIsModalVisible(false);
     }
-    
   };
 
   useEffect(() => {
@@ -65,7 +77,6 @@ const GetAITools: FC<GetAIToolsProps> = ({ removeTool, handleAddTool, onChange }
   }, []);
   return (
     <div>
-      
       <Input
         placeholder="Search tools"
         prefix={<SearchOutlined />}
@@ -89,7 +100,7 @@ const GetAITools: FC<GetAIToolsProps> = ({ removeTool, handleAddTool, onChange }
           },
           pageSize: 3,
         }}
-        style={{ maxHeight: "225px"  }}
+        style={{ maxHeight: "225px" }}
         dataSource={availableTools}
         bordered
         renderItem={(tool) => (

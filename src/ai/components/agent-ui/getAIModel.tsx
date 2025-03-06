@@ -3,13 +3,15 @@ import React, { FC } from "react";
 import { useModels } from "../../hooks/useModels";
 
 type GetAIModelProps = {
-    onChange: (value: string) => void;
+  defaultValue?: string;
+  onChange: (value: string) => void;
 };
 
-const GetAIModel: FC<GetAIModelProps> = ({onChange}) => {
+const GetAIModel: FC<GetAIModelProps> = ({ onChange, defaultValue }) => {
   const { models } = useModels();
   return (
     <Select
+      defaultValue={defaultValue}
       placeholder="Select a model"
       onSelect={(value) => {
         localStorage.setItem("selectedModel", value);

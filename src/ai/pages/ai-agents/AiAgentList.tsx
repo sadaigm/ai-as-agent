@@ -3,7 +3,10 @@ import { Card, Row, Col, Descriptions, Collapse, theme, Button } from "antd";
 import {
   ApiOutlined,
   CaretRightOutlined,
+  DeleteOutlined,
+  EditOutlined,
   FunctionOutlined,
+  UserAddOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import { AIAgent, Tool } from "../../components/types/tool";
@@ -46,8 +49,8 @@ const AiAgentList: React.FC = () => {
 
   return (
     <div>
-      <Button type="primary" onClick={handleAdd} style={{ marginBottom: "16px" }}>
-        Add AI Agent
+      <Button icon={<UserAddOutlined />}  onClick={handleAdd} style={{ marginBottom: "16px" }}>
+        New AI Agent
       </Button>
       <Row gutter={16}>
         {agents.map((agent, index) => (
@@ -70,8 +73,8 @@ const AiAgentList: React.FC = () => {
               }
               extra={
                 <>
-                  <Button onClick={() => handleEdit(agent)}>Edit</Button>
-                  <Button onClick={() => handleDelete(agent.name)} style={{ marginLeft: "8px" }}>
+                  <Button icon={<EditOutlined />} onClick={() => handleEdit(agent)}>Edit</Button>
+                  <Button icon={<DeleteOutlined />} onClick={() => handleDelete(agent.name)} style={{ marginLeft: "8px" }}>
                     Delete
                   </Button>
                 </>
@@ -82,13 +85,13 @@ const AiAgentList: React.FC = () => {
           </Col>
         ))}
       </Row>
-      <AddEditAiAgentModal
+      {isModalVisible && <AddEditAiAgentModal
         visible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
         onSave={handleSave}
         agent={editingAgent}
         availableTools={availableTools}
-      />
+      />}
     </div>
   );
 };

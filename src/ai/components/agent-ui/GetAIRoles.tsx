@@ -4,6 +4,7 @@ import { SystemRolePrompt } from "../types/tool";
 import { getSystemPromptTemplates as getRoleSystemPromptTemplates } from "../../utils/service";
 
 type GetAIRolesProps = {
+  defaultValue?: string;
   existingRolesOnly?: boolean;
   onChange: (value: string) => void;
   onRoleChange?: (systemRolePrompt: SystemRolePrompt) => void;
@@ -13,6 +14,7 @@ const GetAIRoles: FC<GetAIRolesProps> = ({
   onChange,
   existingRolesOnly,
   onRoleChange,
+  defaultValue,
 }) => {
   const [sysPromptList, setsysPromptList] = useState<SystemRolePrompt[]>([]);
   useEffect(() => {
@@ -56,6 +58,7 @@ const GetAIRoles: FC<GetAIRolesProps> = ({
 
   return (
     <Select
+      defaultValue={defaultValue}
       style={{ width: "50%" }}
       placeholder="Select a Role"
       onChange={onChanged}

@@ -46,6 +46,7 @@ const AddEditAiAgentModal: React.FC<AddEditAiAgentModalProps> = ({
     form
       .validateFields()
       .then((values) => {
+        console.log({values})
         onSave(values as AIAgent);
         onClose();
         form.resetFields();
@@ -60,15 +61,20 @@ const AddEditAiAgentModal: React.FC<AddEditAiAgentModalProps> = ({
     form.setFieldValue("tools", tools);
   };
 
+  const handleClose = () => {
+    form.resetFields();
+    onClose();
+  }
+
   return (
     <Modal
         className="add__ai__agent-modal fullmodel"
       visible={visible}
       title={agent ? "Edit AI Agent" : "Add AI Agent"}
-      onCancel={onClose}
+      onCancel={handleClose}
        width="90%"
       footer={[
-        <Button key="back" onClick={onClose}>
+        <Button key="back" onClick={handleClose}>
           Cancel
         </Button>,
         <Button key="submit" type="primary" onClick={handleSave}>
@@ -88,8 +94,10 @@ const AddEditAiAgentModal: React.FC<AddEditAiAgentModalProps> = ({
           // setConversation([]);
         }}
       >
-        <Form.Item label="Select AI Role" name="systemRoleTemplate" rules={[]}>
+        <Form.Item label="Select AI Role" name="systemRoleTemplate" rules={[]}
+        >
           <GetAIRoles
+            defaultValue={agent?.systemRoleTemplate}
             existingRolesOnly={true}
             onChange={(value) => {
               console.log(value);              
@@ -142,6 +150,7 @@ const AddEditAiAgentModal: React.FC<AddEditAiAgentModalProps> = ({
           rules={[{ required: true, message: "Please select a model" }]}
         >
           <GetAIModel
+            defaultValue={agent?.model}
             onChange={(v) => {
               console.log({ v });
               form.setFieldValue("model", v);
@@ -165,7 +174,7 @@ const AddEditAiAgentModal: React.FC<AddEditAiAgentModalProps> = ({
           <Checkbox>Stream</Checkbox>
         </Form.Item>
         <Form.Item label="Tools" name="tools">
-          <GetAITools onChange={onToolChange} />
+          <GetAITools defaultValue={agent?.tools} onChange={onToolChange} />
         </Form.Item>
       </Form>
     </Modal>
