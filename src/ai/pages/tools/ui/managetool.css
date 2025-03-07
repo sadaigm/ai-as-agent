@@ -1,0 +1,4 @@
+.manage__tool-list .ant-list-item-meta-description {    
+    max-height: 125px;
+    overflow-y: auto;
+}

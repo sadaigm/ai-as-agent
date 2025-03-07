@@ -67,15 +67,15 @@ const ToolPage = () => {
         Import Tools
       </Button>
      </Space>
-      <ImportToolPage isModalVisible={isImportVisible}
+      {isImportVisible && <ImportToolPage isModalVisible={isImportVisible}
         setIsModalVisible={setIsImportVisible}
-        saveImport={saveImport} />
+        saveImport={saveImport} />}
       <ToolList tools={tools} updateTool={saveTool} deleteTool={deleteTool} />
-      <AddTool
+      {isModalVisible && <AddTool
         isModalVisible={isModalVisible}
         setIsModalVisible={setIsModalVisible}
         saveTool={saveTool}
-      />
+      />}
     </div>
   );
 };

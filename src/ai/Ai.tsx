@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -9,6 +9,8 @@ import {
 import { Button, Layout, Menu, MenuProps, theme } from "antd";
 import AiRoutes from "./AiRoutes";
 import { useInitData } from "./hooks/useInitData";
+import useScreenSize from "./hooks/useScreenSize";
+import { CSSProperties } from "styled-components";
 
 const { Header, Sider, Content } = Layout;
 
@@ -18,10 +20,42 @@ export const themeColors = {
 };
 
 const Ai = () => {
-  const [collapsed, setCollapsed] = useState(false);
+  const { screenSize } = useScreenSize();
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+  console.log({ screenSize });
+  const [contentStyle, setcontentStyle] = useState<CSSProperties>({
+    minHeight: 280,
+    height: "100%",
+    background: colorBgContainer,
+    borderRadius: borderRadiusLG,
+  });
+  const [collapsed, setCollapsed] = useState(
+    screenSize === "mobile" || screenSize === "tablet"
+  );
+
+  useEffect(() => {
+    setCollapsed(screenSize === "mobile" || screenSize === "tablet");
+    if (screenSize === "mobile" || screenSize === "tablet") {
+      setcontentStyle({
+        minHeight: 280,
+        height: "100%",
+        background: colorBgContainer,
+        borderRadius: borderRadiusLG,
+      });
+    } else {
+      setcontentStyle({
+        minHeight: 280,
+        height: "100%",
+        background: colorBgContainer,
+        borderRadius: borderRadiusLG,
+        margin: "24px 16px",
+        padding: 24,
+      });
+    }
+  }, [screenSize]);
+
   const [current, setCurrent] = useState(
     window.location.pathname.replace("/", "") || "agents"
   );
@@ -30,6 +64,7 @@ const Ai = () => {
     setCurrent(e.key);
     window.location.assign("/" + e.key);
   };
+
   useInitData();
   return (
     <div>
@@ -98,16 +133,7 @@ const Ai = () => {
             />
             <span style={{ fontSize: "18px" }}>AI Agent</span>
           </Header>
-          <Content
-            style={{
-              margin: "24px 16px",
-              padding: 24,
-              minHeight: 280,
-              height: "100%",
-              background: colorBgContainer,
-              borderRadius: borderRadiusLG,
-            }}
-          >
+          <Content style={contentStyle}>
             <AiRoutes />
           </Content>
         </Layout>

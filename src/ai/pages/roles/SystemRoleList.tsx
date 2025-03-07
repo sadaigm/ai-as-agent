@@ -71,7 +71,7 @@ const SystemRoleList: React.FC<SystemRolePromptGridProps> = ({
   return (
     <Row gutter={16}>
       {systemRolePrompts.map((prompt) => (
-        <Col span={8} key={prompt.id}>
+        <Col xs={24} sm={12} md={8} key={prompt.id}>
           <SystemRolePromptCard systemRolePrompt={prompt} onEdit={onEdit} onDelete={onDelete} />
         </Col>
       ))}
