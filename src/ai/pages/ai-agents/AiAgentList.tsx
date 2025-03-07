@@ -10,7 +10,7 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import { AIAgent, Tool } from "../../components/types/tool";
-import { getRandomColor } from "../../hooks/ui-utils";
+import { getRandomColor } from "../../utils/ui-utils";
 import { getTools } from "../../utils/service";
 import { useAgents } from "../../hooks/useAgents";
 import AddEditAiAgentModal from "./AddEditAiAgentModal";
