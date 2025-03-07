@@ -29,7 +29,21 @@ Designed with flexibility in mind, **AI Agent UI** is the ideal tool for users l
     - **Function Tool**: Users can create tools that perform specific functions or calculations. These tools can be configured to take inputs and return results based on the defined logic.
 
     - **REST API Tool**: Users can integrate any REST API as a tool for the AI agent. This allows the agent to fetch data or perform actions using external APIs, enhancing its capabilities. Users can configure API endpoints, request methods, headers, and parameters to tailor the API interactions to their needs.
-## Multi Agent Management
+
+    ### Import API from Swagger Config JSON
+
+    Users can import API configurations from a Swagger JSON file. This feature allows users to select any GET API from the Swagger documentation and add it to the tools.
+
+    #### Steps to Import API
+
+    1. **Upload Swagger JSON**: Users can upload a Swagger JSON file that contains the API documentation.
+    2. **Select GET API**: From the uploaded Swagger file, users can browse and select any available GET API.
+    3. **Configure API Tool**: Once selected, users can configure the API tool by setting the endpoint, request method, headers, and parameters.
+    4. **Add to Tools**: After configuration, the API tool can be added to the list of available tools for the AI agent.
+
+    This feature simplifies the process of integrating external APIs, making it easier for users to enhance the functionality of their AI agents with minimal effort.
+
+    ## Multi Agent Management
 
 - **Multiple Agents Management**: Users can create multiple agents and view the list of available agents in the Agent list view. Users can view, add, edit, and delete agents.
 
