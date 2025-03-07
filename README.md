@@ -19,11 +19,69 @@ Designed with flexibility in mind, **AI Agent UI** is the ideal tool for users l
 - **Tool Interaction**: Select and add tools for the agent to use.
 - **UI Layout**: Split layout for agent configuration and result display.
 
-## New Features Coming Soon
+## New Features
 
-- **AI Roles Page**: A new page where users can manage and configure AI roles. AI roles will help define the behavior of the agent.
-- **AI Tools Page**: A new page for users to configure and manage a list of available tools. Currently, a tool for "Getting Current Weather" is implemented as an example, but additional tools will be added in the future.
-- **Tool Configuration**: Users will be able to add new tools dynamically to the agent's configuration. Tools will be stored and managed separately in local storage.
+- **AI Roles Page**: A new page where users can manage and configure AI roles. AI roles help define the behavior of the agent. Users can view, add, edit, and delete roles.
+- **AI Tools Page**: A new page for users to configure and manage a list of available tools. Currently, a tool for "Getting Current Weather" is implemented as an example, but additional tools can be added. Users can view, add, edit, and delete tools.
+
+  - **Tool Configuration**: Users can add new tools dynamically to the agent's configuration. Tools are stored and managed separately in local storage.
+
+    - **Function Tool**: Users can create tools that perform specific functions or calculations. These tools can be configured to take inputs and return results based on the defined logic.
+
+    - **REST API Tool**: Users can integrate any REST API as a tool for the AI agent. This allows the agent to fetch data or perform actions using external APIs, enhancing its capabilities. Users can configure API endpoints, request methods, headers, and parameters to tailor the API interactions to their needs.
+
+    ### Import API from Swagger Config JSON
+
+    Users can import API configurations from a Swagger JSON file. This feature allows users to select any GET API from the Swagger documentation and add it to the tools.
+
+    #### Steps to Import API
+
+    1. **Upload Swagger JSON**: Users can upload a Swagger JSON file that contains the API documentation.
+    2. **Select GET API**: From the uploaded Swagger file, users can browse and select any available GET API.
+    3. **Configure API Tool**: Once selected, users can configure the API tool by setting the endpoint, request method, headers, and parameters.
+    4. **Add to Tools**: After configuration, the API tool can be added to the list of available tools for the AI agent.
+
+  - **Agent Tools Support**: 
+  ![List of Agent Tools](./screenshots/tools.png)
+  ![Import Agent Tools from Swagger Config Json - Step1](./screenshots/import_1.png)
+  ![Import Agent Tools from Swagger Config Json - Step2](./screenshots/import_2.png)
+  ![Import Agent Tools from Swagger Config Json - Step3](./screenshots/import_3.png)
+  ![Import Agent Tools from Swagger Config Json - Step4](./screenshots/import_4.png)
+
+    This feature simplifies the process of integrating external APIs, making it easier for users to enhance the functionality of their AI agents with minimal effort.
+
+    ## Multi Agent Management
+
+- **Multiple Agents Management**: Users can create multiple agents and view the list of available agents in the Agent list view. Users can view, add, edit, and delete agents.
+
+- **AI Agents List View**:
+  ![List of AI Agents](./screenshots/AI-Agents-ListView.png)
+  ![New AI Agent](./screenshots/New-AI-Agent.png)
+  ![Edit AI Agent](./screenshots/Edit-AI-Agent.png)
+  ![Edit AI Agent with Tools](./screenshots/Edit-AI-Agent-WithTools.png)  
+
+### Benefits and Critical Usage of AI with Different Roles and Tool Support
+
+#### Benefits
+
+1. **Personalization**: By defining different AI roles, users can tailor the behavior and responses of AI agents to specific needs, such as an assistant, researcher, or advisor.
+2. **Efficiency**: Specialized roles allow AI agents to perform tasks more efficiently by focusing on specific functions and contexts.
+3. **Scalability**: Managing multiple agents with distinct roles enables users to scale their AI operations, handling various tasks simultaneously.
+4. **Enhanced Capabilities**: Integrating tools with AI agents extends their functionality, allowing them to perform complex tasks like fetching data from APIs or executing specific functions.
+
+#### Critical Usage
+
+1. **Research and Analysis**: AI agents with a "Researcher" role can gather and analyze data from various sources, providing insights and summaries.
+2. **Customer Support**: An AI agent with an "Assistant" role can handle customer queries, provide information, and perform actions like booking appointments.
+3. **Data Integration**: Using tools like REST API integration, AI agents can fetch real-time data (e.g., weather information) and use it to provide accurate responses.
+4. **Automation**: AI agents can automate repetitive tasks, such as data entry or report generation, improving productivity and reducing human error.
+- **Agent Persona**: 
+  ![Role Based Configuration 1](./screenshots/role_based_1.png)
+  ![Role Based Configuration 2](./screenshots/role_based_2.png)
+  ![Role Based Configuration 3](./screenshots/role_based_3.png)
+  ![List of Agent Roles](./screenshots/Agent%20Role.png)
+
+By leveraging different roles and tool support, users can create versatile and powerful AI agents tailored to their specific requirements.
 
 ## Installation
 
@@ -83,9 +141,9 @@ npm run preview
 
 ## Component Overview
 
-### `AIAgentUI`
+### `AI Playground`
 
-This is the main component for the AI agent configuration UI. It handles form submission, tool selection, and response display.
+This is the main component for the AI Playground UI. It handles form submission, tool selection, and response display.
 
 - **Left Form Fields**:
   - **Model**: Select an AI model.
@@ -122,13 +180,6 @@ As an example, a tool for getting the current weather has been implemented. This
 
 ## Screenshots
 
-- **AI Agents ListView**:
-  ![List of AI Agents](./screenshots/AI-Agents-ListView.png)
-  ![New AI Agent](./screenshots/New-AI-Agent.png)
-  ![Edit AI Agent](./screenshots/Edit-AI-Agent.png)
-  ![Edit AI Agent with Tools](./screenshots/Edit-AI-Agent-WithTools.png)  
-  
-
 - **AI Playground**: 
   ![AI Playground](./screenshots/AI-Playground.png)
   ![Configuration Form](./screenshots/configuration_form.png)
@@ -136,19 +187,6 @@ As an example, a tool for getting the current weather has been implemented. This
 - **Response Panel**: 
   ![Streaming Response](./screenshots/streaming_response_1.png)
   ![Non Stream Agent With Tool Response](./screenshots/agent_with_tool_calls_1.png)
-
-- **Agent Persona**: 
-  ![Role Based Configuration 1](./screenshots/role_based_1.png)
-  ![Role Based Configuration 2](./screenshots/role_based_2.png)
-  ![Role Based Configuration 3](./screenshots/role_based_3.png)
-  ![List of Agent Roles](./screenshots/Agent%20Role.png)
-
-- **Agent Tools Support**: 
-  ![List of Agent Tools](./screenshots/tools.png)
-  ![Import Agent Tools from Swagger Config Json - Step1](./screenshots/import_1.png)
-  ![Import Agent Tools from Swagger Config Json - Step2](./screenshots/import_2.png)
-  ![Import Agent Tools from Swagger Config Json - Step3](./screenshots/import_3.png)
-  ![Import Agent Tools from Swagger Config Json - Step4](./screenshots/import_4.png)
 
 
 ## Dependencies
