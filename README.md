@@ -41,11 +41,24 @@ Designed with flexibility in mind, **AI Agent UI** is the ideal tool for users l
     3. **Configure API Tool**: Once selected, users can configure the API tool by setting the endpoint, request method, headers, and parameters.
     4. **Add to Tools**: After configuration, the API tool can be added to the list of available tools for the AI agent.
 
+  - **Agent Tools Support**: 
+  ![List of Agent Tools](./screenshots/tools.png)
+  ![Import Agent Tools from Swagger Config Json - Step1](./screenshots/import_1.png)
+  ![Import Agent Tools from Swagger Config Json - Step2](./screenshots/import_2.png)
+  ![Import Agent Tools from Swagger Config Json - Step3](./screenshots/import_3.png)
+  ![Import Agent Tools from Swagger Config Json - Step4](./screenshots/import_4.png)
+
     This feature simplifies the process of integrating external APIs, making it easier for users to enhance the functionality of their AI agents with minimal effort.
 
     ## Multi Agent Management
 
 - **Multiple Agents Management**: Users can create multiple agents and view the list of available agents in the Agent list view. Users can view, add, edit, and delete agents.
+
+- **AI Agents List View**:
+  ![List of AI Agents](./screenshots/AI-Agents-ListView.png)
+  ![New AI Agent](./screenshots/New-AI-Agent.png)
+  ![Edit AI Agent](./screenshots/Edit-AI-Agent.png)
+  ![Edit AI Agent with Tools](./screenshots/Edit-AI-Agent-WithTools.png)  
 
 ### Benefits and Critical Usage of AI with Different Roles and Tool Support
 
@@ -62,6 +75,11 @@ Designed with flexibility in mind, **AI Agent UI** is the ideal tool for users l
 2. **Customer Support**: An AI agent with an "Assistant" role can handle customer queries, provide information, and perform actions like booking appointments.
 3. **Data Integration**: Using tools like REST API integration, AI agents can fetch real-time data (e.g., weather information) and use it to provide accurate responses.
 4. **Automation**: AI agents can automate repetitive tasks, such as data entry or report generation, improving productivity and reducing human error.
+- **Agent Persona**: 
+  ![Role Based Configuration 1](./screenshots/role_based_1.png)
+  ![Role Based Configuration 2](./screenshots/role_based_2.png)
+  ![Role Based Configuration 3](./screenshots/role_based_3.png)
+  ![List of Agent Roles](./screenshots/Agent%20Role.png)
 
 By leveraging different roles and tool support, users can create versatile and powerful AI agents tailored to their specific requirements.
 
@@ -123,9 +141,9 @@ npm run preview
 
 ## Component Overview
 
-### `AIAgentUI`
+### `AI Playground`
 
-This is the main component for the AI agent configuration UI. It handles form submission, tool selection, and response display.
+This is the main component for the AI Playground UI. It handles form submission, tool selection, and response display.
 
 - **Left Form Fields**:
   - **Model**: Select an AI model.
@@ -162,13 +180,6 @@ As an example, a tool for getting the current weather has been implemented. This
 
 ## Screenshots
 
-- **AI Agents ListView**:
-  ![List of AI Agents](./screenshots/AI-Agents-ListView.png)
-  ![New AI Agent](./screenshots/New-AI-Agent.png)
-  ![Edit AI Agent](./screenshots/Edit-AI-Agent.png)
-  ![Edit AI Agent with Tools](./screenshots/Edit-AI-Agent-WithTools.png)  
-  
-
 - **AI Playground**: 
   ![AI Playground](./screenshots/AI-Playground.png)
   ![Configuration Form](./screenshots/configuration_form.png)
@@ -176,19 +187,6 @@ As an example, a tool for getting the current weather has been implemented. This
 - **Response Panel**: 
   ![Streaming Response](./screenshots/streaming_response_1.png)
   ![Non Stream Agent With Tool Response](./screenshots/agent_with_tool_calls_1.png)
-
-- **Agent Persona**: 
-  ![Role Based Configuration 1](./screenshots/role_based_1.png)
-  ![Role Based Configuration 2](./screenshots/role_based_2.png)
-  ![Role Based Configuration 3](./screenshots/role_based_3.png)
-  ![List of Agent Roles](./screenshots/Agent%20Role.png)
-
-- **Agent Tools Support**: 
-  ![List of Agent Tools](./screenshots/tools.png)
-  ![Import Agent Tools from Swagger Config Json - Step1](./screenshots/import_1.png)
-  ![Import Agent Tools from Swagger Config Json - Step2](./screenshots/import_2.png)
-  ![Import Agent Tools from Swagger Config Json - Step3](./screenshots/import_3.png)
-  ![Import Agent Tools from Swagger Config Json - Step4](./screenshots/import_4.png)
 
 
 ## Dependencies
