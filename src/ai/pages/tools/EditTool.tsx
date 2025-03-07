@@ -5,6 +5,7 @@ import { ChatPayload } from "../../components/types/tool";
 import { useSubmitHandler } from "../../hooks/useSubmitHandler";
 import ParameterList from "./ParameterList";
 import { parseResponse } from "../../components/response/response-utils";
+import { GetToolIcon } from "./ui/GetToolLabel";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -130,6 +131,7 @@ const EditTool: FC<EditToolProps> = ({
     <Modal
       title="Edit Tool"
       visible={isModalVisible}
+      onClose={handleCancel}
       onOk={handleUpdateTool}
       onCancel={handleCancel}
       width={800}
@@ -175,8 +177,8 @@ const EditTool: FC<EditToolProps> = ({
           rules={[{ required: true, message: "Please select the tool type!" }]}
         >
           <Select onChange={(value) => setToolType(value)}>
-            <Option value="function">Function</Option>
-            <Option value="rest">Rest</Option>
+            <Option value="function"><GetToolIcon type="function" /> {' '}Function</Option>
+            <Option value="rest"> <GetToolIcon type="rest" /> {' '} Rest</Option>
           </Select>
         </Form.Item>
         {toolType === "rest" && (

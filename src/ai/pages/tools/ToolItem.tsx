@@ -118,12 +118,13 @@ const ToolList: React.FC<ToolListProps> = ({ tools, updateTool, deleteTool }) =>
           </Col>
         ))}
       </Row>
-      {selectedTool && (
+      {selectedTool && isEditModalVisible && (
         <EditTool
           isModalVisible={isEditModalVisible}
           setIsModalVisible={setIsEditModalVisible}
           tool={selectedTool}
           updateTool={handleUpdateTool}
+
         />
       )}
     </div>

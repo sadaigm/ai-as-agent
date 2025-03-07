@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Modal,
   Form,
@@ -32,6 +32,7 @@ const AddEditAiAgentModal: React.FC<AddEditAiAgentModalProps> = ({
   availableTools,
 }) => {
   const [form] = Form.useForm();
+  const [enableSave, setEnableSave] = useState(false)
 
   useEffect(() => {
     if (agent) {
@@ -77,7 +78,7 @@ const AddEditAiAgentModal: React.FC<AddEditAiAgentModalProps> = ({
         <Button key="back" onClick={handleClose}>
           Cancel
         </Button>,
-        <Button key="submit" type="primary" onClick={handleSave}>
+        <Button key="submit" type="primary" disabled={!enableSave} onClick={handleSave}>
           Save
         </Button>,
       ]}
@@ -91,6 +92,12 @@ const AddEditAiAgentModal: React.FC<AddEditAiAgentModalProps> = ({
         }}
         onValuesChange={(changedValues, allValues) => {
           console.log({ changedValues, allValues });
+          if(Object.keys(changedValues).length> 0){
+            setEnableSave(true)
+          }
+          else{
+            setEnableSave(false)
+          }
           // setConversation([]);
         }}
       >

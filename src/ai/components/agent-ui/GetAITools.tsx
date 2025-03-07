@@ -8,6 +8,8 @@ import {
 import { getFuncParamsString } from "../../utils/function";
 import { Tool } from "../types/tool";
 import { getTools } from "../../utils/service";
+import GetToolLabel from "../../pages/tools/ui/GetToolLabel";
+import ManageToolList from "../../pages/tools/ui/ManageToolList";
 
 type GetAIToolsProps = {
   onChange: (tools: Tool[]) => void;
@@ -93,7 +95,7 @@ const GetAITools: FC<GetAIToolsProps> = ({
         }}
         style={{ width: "100%" }}
       />
-      <List
+      {/* <List
         pagination={{
           onChange: (page) => {
             console.log(page);
@@ -120,12 +122,16 @@ const GetAITools: FC<GetAIToolsProps> = ({
               ></Button>,
             ]}
           >
-            {tool.type} : {getFuncParamsString(tool)}
+            <GetToolLabel tool={tool} showParams />
           </List.Item>
         )}
-      />
+      /> */}
+
+        <ManageToolList  tools={availableTools} showAdd  enabledTools={tools} handleToolSelect={handleToolSelect} />
+
       <br />
-      <List
+      <ManageToolList tools={tools} showRemove handleRemove={handleRemove} />
+      {/* <List
         size="small"
         bordered
         pagination={{
@@ -148,10 +154,10 @@ const GetAITools: FC<GetAIToolsProps> = ({
               ></Button>,
             ]}
           >
-            {tool.type} : {getFuncParamsString(tool)}
+            <GetToolLabel tool={tool} showParams />
           </List.Item>
         )}
-      />
+      /> */}
       <Modal
         title="Add Tool"
         visible={isModalVisible}
