@@ -104,7 +104,7 @@ body {
 }
 
 .fullmodel .ant-modal-body {
-  height: calc(100% - 140px );
+  height: calc(100% - 150px );
   background-color: #f5f5f5;
   padding:10px;
   overflow-y: auto;

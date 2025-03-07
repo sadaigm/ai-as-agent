@@ -8,7 +8,12 @@ import "./role.css";
 import { UserAddOutlined } from "@ant-design/icons";
 
 const SystemRolePage = () => {
-  const { errorMessage, systemRolePrompts, saveSystemRolePrompt, deleteSystemRolePrompt } = useSystemRole();
+  const {
+    errorMessage,
+    systemRolePrompts,
+    saveSystemRolePrompt,
+    deleteSystemRolePrompt,
+  } = useSystemRole();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingRole, setEditingRole] = useState<SystemRolePrompt | null>(null);
 
@@ -39,28 +44,45 @@ const SystemRolePage = () => {
   }
 
   return (
-    <div className="system__roles" style={{
-      height:"100%",
-      width:"100%",
-      overflowY:"auto",
-      padding:"10px"
-    }}>
-      <Button
-        // type="primary"
-        onClick={showModal}
-        style={{ marginBottom: "16px" }}
-        icon={<UserAddOutlined />}
+    <div
+      style={{
+        height: "100%",
+        width: "100%",
+      }}
+    >
+      <div style={{ height: "50px" }}>
+        {" "}
+        <Button
+          // type="primary"
+          onClick={showModal}
+          style={{ marginBottom: "16px" }}
+          icon={<UserAddOutlined />}
+        >
+          Add Role
+        </Button>
+      </div>
+      <div
+        className="system__roles"
+        style={{
+          height: "calc(100% - 50px)",
+          width: "100%",
+          overflowY: "auto",
+          padding: "10px",
+        }}
       >
-        Add Role
-      </Button>
-      <SystemRoleList systemRolePrompts={systemRolePrompts} onEdit={handleEdit} onDelete={handleDelete} />
-      <AddSystemRole
-        isModalVisible={isModalVisible}
-        setIsModalVisible={setIsModalVisible}
-        saveSystemRolePrompt={saveSystemRolePrompt}
-        editingRole={editingRole}
-        setEditingRole={setEditingRole}
-      />
+        <SystemRoleList
+          systemRolePrompts={systemRolePrompts}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+        <AddSystemRole
+          isModalVisible={isModalVisible}
+          setIsModalVisible={setIsModalVisible}
+          saveSystemRolePrompt={saveSystemRolePrompt}
+          editingRole={editingRole}
+          setEditingRole={setEditingRole}
+        />
+      </div>
     </div>
   );
 };
