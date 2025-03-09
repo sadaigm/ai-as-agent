@@ -17,31 +17,33 @@ const GetAIRoles: FC<GetAIRolesProps> = ({
   defaultValue,
 }) => {
   const [sysPromptList, setsysPromptList] = useState<SystemRolePrompt[]>([]);
+  const [filteredRoles, setFilteredRoles] = useState<{ value: string; label: string; }[]>([]);
+
   useEffect(() => {
     getRoleSystemPromptTemplates().then((data) => {
       setsysPromptList(data);
+      setFilteredRoles(fetchRoleOptions(data));
     });
   }, []);
-  const getRoles = sysPromptList.map(
-    (systemRolePrompt: SystemRolePrompt, index) => {
+
+  const getRoles = (data: SystemRolePrompt[]) => data.map(
+    (systemRolePrompt: SystemRolePrompt) => {
       return {
         value: `${systemRolePrompt.id}`,
         label: `${systemRolePrompt.systemRole}`,
       };
     }
   );
-  const updatedRoles = [
-    {
-      value: "new_role",
-      label: "New Role",
-    },
-    ...getRoles,
-  ];
+
+  const fetchRoleOptions = (data: SystemRolePrompt[]): { value: string; label: string; }[] => {
+    const roles = getRoles(data);
+    return existingRolesOnly ? roles : [{ value: "new_role", label: "New Role" }, ...roles];
+  };
 
   const onChanged = (value: string) => {
     onChange(value);
     if (value !== "new_role") {
-      const data = sysPromptList.find((r) => `${r.id}` === `${value}`);
+      const data = sysPromptList.find((r) => `${r.id}` === value);
       if (data) {
         console.log({ data });
         onRoleChange && onRoleChange(data);
@@ -56,16 +58,24 @@ const GetAIRoles: FC<GetAIRolesProps> = ({
     }
   };
 
+  const onSearch = (value: string) => {
+    const filtered = fetchRoleOptions(sysPromptList).filter(role =>
+      role.label.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredRoles(filtered);
+  };
+
   return (
     <Select
       defaultValue={defaultValue}
       style={{ width: "50%" }}
       placeholder="Select a Role"
       onChange={onChanged}
-      options={existingRolesOnly ? getRoles : updatedRoles}
+      options={filteredRoles}
       allowClear
+      onSearch={onSearch}
       showSearch // Enable search functionality
-      optionFilterProp="children"
+      filterOption={false} // Disable built-in filtering to use custom onSearch
     />
   );
 };
