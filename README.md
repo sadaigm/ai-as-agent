@@ -8,6 +8,55 @@ The platform also allows users to extend the functionality of their AI agents by
 
 Designed with flexibility in mind, **AI Agent UI** is the ideal tool for users looking to build, test, and manage diverse AI agents, all while leveraging powerful open-source AI models and tools.
 
+## Component Overview
+
+### `AI Playground`
+
+This is the main component for the AI Playground UI. It handles form submission, tool selection, and response display.
+
+- **Left Form Fields**:
+  - **Model**: Select an AI model.
+  - **System Role**: Define the AI's role.
+  - **System Prompt**: Set the system prompt.
+  - **User Prompt**: Enter the user's prompt.
+  - **Temperature**: Set the response temperature (0 to 1).
+  - **Stream**: Enable or disable streaming of responses.
+  - **Tools**: Add tools to the agent.
+
+- **Right Panel**: Displays the results of the agent's response in markdown format.
+
+## AI Roles and AI Tools Pages
+
+### AI Roles
+
+A new **AI Roles** page will be created, allowing users to configure different AI roles. Roles help define the behavior and context of the AI agent. Users will be able to create and manage multiple roles.
+
+- **Create and Manage AI Roles**: Users can define roles like "Assistant", "Researcher", "Advisor", etc.
+- **Save Roles**: Roles will be saved to local storage for easy reuse.
+
+### AI Tools
+
+A new **AI Tools** page will allow users to manage a list of tools available for the AI agent to use. Currently, we have an example tool for "Getting Current Weather".
+
+- **Add More Tools**: Users will be able to add additional tools in the future. Tools are managed separately in local storage.
+- **Tool Configuration**: Each tool can have a description and specific configuration to integrate with the AI agent.
+
+## Example Tool Implementation
+
+As an example, a tool for getting the current weather has been implemented. This is just one of the many tools that can be added in the future.
+
+- **Current Weather Tool**: Fetches weather information based on user input and returns it to the AI agent.
+
+## Screenshots
+
+- **AI Playground**: 
+  ![AI Playground](./screenshots/AI-Playground.png)
+  ![Configuration Form](./screenshots/configuration_form.png)
+
+- **Response Panel**: 
+  ![Streaming Response](./screenshots/streaming_response_1.png)
+  ![Non Stream Agent With Tool Response](./screenshots/agent_with_tool_calls_1.png)
+
 ## Features (Ongoing Development)
 
 - **Model Selection**: Choose an AI model from available options.
@@ -138,55 +187,6 @@ npm run preview
   - `response/`: Components to handle markdown and code rendering.
   - `aiagent.css`: Styling for the AI agent UI.
   - `pages/`: New pages for managing AI roles and tools will be placed here.
-
-## Component Overview
-
-### `AI Playground`
-
-This is the main component for the AI Playground UI. It handles form submission, tool selection, and response display.
-
-- **Left Form Fields**:
-  - **Model**: Select an AI model.
-  - **System Role**: Define the AI's role.
-  - **System Prompt**: Set the system prompt.
-  - **User Prompt**: Enter the user's prompt.
-  - **Temperature**: Set the response temperature (0 to 1).
-  - **Stream**: Enable or disable streaming of responses.
-  - **Tools**: Add tools to the agent.
-
-- **Right Panel**: Displays the results of the agent's response in markdown format.
-
-## AI Roles and AI Tools Pages
-
-### AI Roles
-
-A new **AI Roles** page will be created, allowing users to configure different AI roles. Roles help define the behavior and context of the AI agent. Users will be able to create and manage multiple roles.
-
-- **Create and Manage AI Roles**: Users can define roles like "Assistant", "Researcher", "Advisor", etc.
-- **Save Roles**: Roles will be saved to local storage for easy reuse.
-
-### AI Tools
-
-A new **AI Tools** page will allow users to manage a list of tools available for the AI agent to use. Currently, we have an example tool for "Getting Current Weather".
-
-- **Add More Tools**: Users will be able to add additional tools in the future. Tools are managed separately in local storage.
-- **Tool Configuration**: Each tool can have a description and specific configuration to integrate with the AI agent.
-
-## Example Tool Implementation
-
-As an example, a tool for getting the current weather has been implemented. This is just one of the many tools that can be added in the future.
-
-- **Current Weather Tool**: Fetches weather information based on user input and returns it to the AI agent.
-
-## Screenshots
-
-- **AI Playground**: 
-  ![AI Playground](./screenshots/AI-Playground.png)
-  ![Configuration Form](./screenshots/configuration_form.png)
-
-- **Response Panel**: 
-  ![Streaming Response](./screenshots/streaming_response_1.png)
-  ![Non Stream Agent With Tool Response](./screenshots/agent_with_tool_calls_1.png)
 
 
 ## Dependencies
