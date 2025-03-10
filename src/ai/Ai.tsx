@@ -6,6 +6,7 @@ import {
   UserOutlined,
   SettingOutlined,
   QuestionCircleOutlined,
+  AntDesignOutlined,
 } from "@ant-design/icons";
 import { Button, Layout, Menu, MenuProps, theme } from "antd";
 import AiRoutes from "./AiRoutes";
@@ -130,7 +131,7 @@ const Ai = () => {
               items={[
                 {
                   key: "playground-ai",
-                  icon: <UserOutlined />,
+                  icon: <AntDesignOutlined />,
                   label: "AI Playground",
                 },
                 {

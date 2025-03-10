@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Menu } from "antd";
 import { MenuProps } from "antd";
-import { UserOutlined, SettingOutlined, ThunderboltOutlined } from "@ant-design/icons";
+import { UserOutlined, SettingOutlined, ThunderboltOutlined, AntDesignOutlined } from "@ant-design/icons";
 import { useLocation } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import { helpContent } from "./data";
@@ -34,7 +34,7 @@ const onClick: MenuProps["onClick"] = (e) => {
         items={[
           {
             key: "playground-ai",
-            icon: <UserOutlined />,
+            icon: <AntDesignOutlined />,
             label: "AI Playground",
           },
           {
