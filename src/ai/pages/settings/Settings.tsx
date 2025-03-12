@@ -1,30 +1,45 @@
-import React, { useState } from "react";
+import React, { CSSProperties, useState } from "react";
 import {
   Button,
   Card,
+  Collapse,
+  CollapseProps,
+  Descriptions,
+  Empty,
   Form,
   Input,
   List,
   Modal,
   Select,
   Space,
+  theme,
   Typography,
 } from "antd";
-import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
+import {
+  PlusOutlined,
+  DeleteOutlined,
+  CaretRightOutlined,
+  ApiOutlined,
+  ThunderboltOutlined,
+} from "@ant-design/icons";
+import { useEnvironment } from "../../hooks/useEnvironment";
+import { Environment } from "../../components/types/environment";
 
 const { TextArea } = Input;
 
-interface Environment {
-  name: string;
-  hostUrl: string;
-  type: string;
-  headers: { key: string; value: string }[];
-}
-
 const Settings: React.FC = () => {
-  const [environments, setEnvironments] = useState<Environment[]>([]);
+  const { environments, saveEnvironment, deleteEnvironment } = useEnvironment();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
+
+  const { token } = theme.useToken();
+
+  const panelStyle: React.CSSProperties = {
+    marginBottom: 24,
+    background: token.colorFillAlter,
+    borderRadius: token.borderRadiusLG,
+    border: "none",
+  };
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -36,19 +51,64 @@ const Settings: React.FC = () => {
   };
 
   const handleAddEnvironment = (values: any) => {
-    const newEnvironment: Environment = {
+    const newEnvironment = {
       name: values.name,
       hostUrl: values.hostUrl,
       type: values.type,
       headers: values.headers || [],
     };
-    setEnvironments([...environments, newEnvironment]);
+    saveEnvironment(newEnvironment);
     setIsModalVisible(false);
     form.resetFields();
   };
 
-  const removeEnvironment = (name: string) => {
-    setEnvironments(environments.filter((env) => env.name !== name));
+  const getExtra = (item: Environment) => {
+    return (
+      <Button
+        type="text"
+        icon={<DeleteOutlined />}
+        onClick={() => deleteEnvironment(item.name)}
+      />
+    );
+  };
+
+  const getItems: (panelStyle: CSSProperties) => CollapseProps["items"] = (
+    panelStyle
+  ) => {
+    return environments.map((env, index) => ({
+      key: env.name + index,
+      label: (
+        <>
+          <span style={{ marginRight:'5px'}}>{`${env.name}`}</span>
+          {env.type === "AI" ? <ThunderboltOutlined style={{color:"#FF5722"}} /> : <ApiOutlined style={{ color: "#03A9F4"}} />}
+        </>
+      ),
+      extra: getExtra(env),
+      children: (
+        <div>
+          <Descriptions column={1} bordered>
+            <Descriptions.Item label="Host URL">
+              {env.hostUrl}
+            </Descriptions.Item>
+            <Descriptions.Item label="Type">
+            {env.type === "AI" ? <ThunderboltOutlined style={{color:"#FF5722"}} /> : <ApiOutlined style={{ color: "#03A9F4"}} />}
+            <span style={{ marginLeft:'5px'}}>{`${env.name}`}</span>
+              </Descriptions.Item>
+            <Descriptions.Item label="Headers">
+              <ul>
+                {env.headers.map((header) => (
+                  <li key={header.key}>
+                    <Typography.Text strong>{header.key}:</Typography.Text>{" "}
+                    {header.value}
+                  </li>
+                ))}
+              </ul>
+            </Descriptions.Item>
+          </Descriptions>
+        </div>
+      ),
+      style: panelStyle,
+    }));
   };
 
   return (
@@ -61,7 +121,20 @@ const Settings: React.FC = () => {
           </Button>
         }
       >
-        <List
+        {environments.length > 0 ? (
+          <Collapse
+            bordered={false}
+            defaultActiveKey={["1"]}
+            expandIcon={({ isActive }) => (
+              <CaretRightOutlined rotate={isActive ? 90 : 0} />
+            )}
+            style={{ background: token.colorBgContainer }}
+            items={getItems(panelStyle)}
+          />
+        ) : (
+          <Empty description="No environments found" />
+        )}
+        {/* <List
           dataSource={environments}
           renderItem={(item) => (
             <List.Item
@@ -69,7 +142,7 @@ const Settings: React.FC = () => {
                 <Button
                   type="text"
                   icon={<DeleteOutlined />}
-                  onClick={() => removeEnvironment(item.name)}
+                  onClick={() => deleteEnvironment(item.name)}
                 />,
               ]}
             >
@@ -79,7 +152,7 @@ const Settings: React.FC = () => {
               />
             </List.Item>
           )}
-        />
+        /> */}
       </Card>
       <Modal
         title="Add Environment"
@@ -91,7 +164,9 @@ const Settings: React.FC = () => {
           <Form.Item
             label="Environment Name"
             name="name"
-            rules={[{ required: true, message: "Please input the environment name!" }]}
+            rules={[
+              { required: true, message: "Please input the environment name!" },
+            ]}
           >
             <Input />
           </Form.Item>
@@ -105,43 +180,58 @@ const Settings: React.FC = () => {
           <Form.Item
             label="Type"
             name="type"
-            rules={[{ required: true, message: "Please select the environment type!" }]}
+            rules={[
+              {
+                required: true,
+                message: "Please select the environment type!",
+              },
+            ]}
           >
             <Select placeholder="Select environment type">
               <Select.Option value="AI">AI</Select.Option>
               <Select.Option value="Tools">Tools</Select.Option>
             </Select>
           </Form.Item>
-          <Form.Item
-            label="Customer Header Params"
-            name="headers"
-          >
+          <Form.Item label="Customer Header Params" name="headers">
             <Form.List name="headers">
               {(fields, { add, remove }) => (
                 <>
                   {fields.map(({ key, name, fieldKey, ...restField }) => (
-                    <Space key={key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
+                    <Space
+                      key={key}
+                      style={{ display: "flex", marginBottom: 8 }}
+                      align="baseline"
+                    >
                       <Form.Item
                         {...restField}
-                        name={[name, 'key']}
-                        fieldKey={[fieldKey ?? 0, 'key']}
-                        rules={[{ required: true, message: 'Missing key' }]}
+                        name={[name, "key"]}
+                        fieldKey={[fieldKey ?? 0, "key"]}
+                        rules={[{ required: true, message: "Missing key" }]}
                       >
                         <Input placeholder="Key" />
                       </Form.Item>
                       <Form.Item
                         {...restField}
-                        name={[name, 'value']}
-                        fieldKey={[fieldKey ?? 0, 'value']}
-                        rules={[{ required: true, message: 'Missing value' }]}
+                        name={[name, "value"]}
+                        fieldKey={[fieldKey ?? 0, "value"]}
+                        rules={[{ required: true, message: "Missing value" }]}
                       >
                         <Input placeholder="Value" />
                       </Form.Item>
-                      <Button type="text" icon={<DeleteOutlined />} onClick={() => remove(name)} />
+                      <Button
+                        type="text"
+                        icon={<DeleteOutlined />}
+                        onClick={() => remove(name)}
+                      />
                     </Space>
                   ))}
                   <Form.Item>
-                    <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                    <Button
+                      type="dashed"
+                      onClick={() => add()}
+                      block
+                      icon={<PlusOutlined />}
+                    >
                       Add Header
                     </Button>
                   </Form.Item>

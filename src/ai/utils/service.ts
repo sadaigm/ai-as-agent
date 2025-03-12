@@ -1,8 +1,10 @@
 import { SystemRolePrompt, Tool, AIAgent } from "../components/types/tool";
+import { Environment } from "../components/types/environment";
 
 export const AI_TOOLS_KEY = "aitools";
 export const AI_ROLES_KEY = "aisysprompts";
 export const AI_AGENTS_KEY = "aiagents";
+export const ENVIRONMENTS_KEY = "environments";
 
 export const getTools = (): Promise<Tool[]> => {
   const data = localStorage.getItem(AI_TOOLS_KEY);
@@ -55,6 +57,28 @@ export const deleteAgent = (name: string) => {
     const agents = JSON.parse(data) as AIAgent[];
     const updatedAgents = agents.filter(agent => agent.name !== name);
     localStorage.setItem(AI_AGENTS_KEY, JSON.stringify(updatedAgents));
+  }
+};
+
+// New functions for environments
+export const getEnvironments = (): Promise<Environment[]> => {
+  const data = localStorage.getItem(ENVIRONMENTS_KEY);
+  if (data) {
+    return Promise.resolve(JSON.parse(data) as Environment[]);
+  }
+  return Promise.resolve([] as Environment[]);
+};
+
+export const saveEnvironments = (environments: Environment[]) => {
+  localStorage.setItem(ENVIRONMENTS_KEY, JSON.stringify(environments));
+};
+
+export const deleteEnvironmentByName = (name: string) => {
+  const data = localStorage.getItem(ENVIRONMENTS_KEY);
+  if (data) {
+    const environments = JSON.parse(data) as Environment[];
+    const updatedEnvironments = environments.filter(env => env.name !== name);
+    localStorage.setItem(ENVIRONMENTS_KEY, JSON.stringify(updatedEnvironments));
   }
 };
 
