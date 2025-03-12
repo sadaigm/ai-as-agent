@@ -8,7 +8,6 @@ import {
   Empty,
   Form,
   Input,
-  List,
   Modal,
   Select,
   Space,
@@ -18,6 +17,7 @@ import {
 import {
   PlusOutlined,
   DeleteOutlined,
+  EditOutlined,
   CaretRightOutlined,
   ApiOutlined,
   ThunderboltOutlined,
@@ -30,6 +30,8 @@ const { TextArea } = Input;
 const Settings: React.FC = () => {
   const { environments, saveEnvironment, deleteEnvironment } = useEnvironment();
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [currentEnvironment, setCurrentEnvironment] = useState<Environment | null>(null);
   const [form] = Form.useForm();
 
   const { token } = theme.useToken();
@@ -48,6 +50,8 @@ const Settings: React.FC = () => {
   const handleCancel = () => {
     setIsModalVisible(false);
     form.resetFields();
+    setIsEditMode(false);
+    setCurrentEnvironment(null);
   };
 
   const handleAddEnvironment = (values: any) => {
@@ -62,13 +66,49 @@ const Settings: React.FC = () => {
     form.resetFields();
   };
 
+  const handleEditEnvironment = (values: any) => {
+    const updatedEnvironment = {
+      ...currentEnvironment,
+      name: values.name,
+      hostUrl: values.hostUrl,
+      type: values.type,
+      headers: values.headers || [],
+    };
+    saveEnvironment(updatedEnvironment);
+    setIsModalVisible(false);
+    form.resetFields();
+    setIsEditMode(false);
+    setCurrentEnvironment(null);
+  };
+
   const getExtra = (item: Environment) => {
     return (
-      <Button
-        type="text"
-        icon={<DeleteOutlined />}
-        onClick={() => deleteEnvironment(item.name)}
-      />
+      <Space>
+        <Button
+          type="text"
+          icon={<EditOutlined />}
+          onClick={(e) => {
+        setIsEditMode(true);
+        setCurrentEnvironment(item);
+        form.setFieldsValue(item);
+        showModal();
+        e.stopPropagation();
+          }}
+        />
+        <Button
+          type="text"
+          icon={<DeleteOutlined />}
+          onClick={(e) => {
+        Modal.confirm({
+          title: 'Are you sure you want to delete this environment?',
+          onOk: () => {
+            deleteEnvironment(item.name);
+          },
+        });
+        e.stopPropagation();
+          }}
+        />
+      </Space>
     );
   };
 
@@ -79,8 +119,12 @@ const Settings: React.FC = () => {
       key: env.name + index,
       label: (
         <>
-          <span style={{ marginRight:'5px'}}>{`${env.name}`}</span>
-          {env.type === "AI" ? <ThunderboltOutlined style={{color:"#FF5722"}} /> : <ApiOutlined style={{ color: "#03A9F4"}} />}
+          <span style={{ marginRight: "5px" }}>{`${env.name}`}</span>
+          {env.type === "AI" ? (
+            <ThunderboltOutlined style={{ color: "#FF5722" }} />
+          ) : (
+            <ApiOutlined style={{ color: "#03A9F4" }} />
+          )}
         </>
       ),
       extra: getExtra(env),
@@ -91,9 +135,13 @@ const Settings: React.FC = () => {
               {env.hostUrl}
             </Descriptions.Item>
             <Descriptions.Item label="Type">
-            {env.type === "AI" ? <ThunderboltOutlined style={{color:"#FF5722"}} /> : <ApiOutlined style={{ color: "#03A9F4"}} />}
-            <span style={{ marginLeft:'5px'}}>{`${env.name}`}</span>
-              </Descriptions.Item>
+              {env.type === "AI" ? (
+                <ThunderboltOutlined style={{ color: "#FF5722" }} />
+              ) : (
+                <ApiOutlined style={{ color: "#03A9F4" }} />
+              )}
+              <span style={{ marginLeft: "5px" }}>{`${env.name}`}</span>
+            </Descriptions.Item>
             <Descriptions.Item label="Headers">
               <ul>
                 {env.headers.map((header) => (
@@ -134,33 +182,18 @@ const Settings: React.FC = () => {
         ) : (
           <Empty description="No environments found" />
         )}
-        {/* <List
-          dataSource={environments}
-          renderItem={(item) => (
-            <List.Item
-              actions={[
-                <Button
-                  type="text"
-                  icon={<DeleteOutlined />}
-                  onClick={() => deleteEnvironment(item.name)}
-                />,
-              ]}
-            >
-              <List.Item.Meta
-                title={item.name}
-                description={`Type: ${item.type}, Host URL: ${item.hostUrl}`}
-              />
-            </List.Item>
-          )}
-        /> */}
       </Card>
       <Modal
-        title="Add Environment"
+        title={isEditMode ? "Edit Environment" : "Add Environment"}
         visible={isModalVisible}
         onCancel={handleCancel}
         footer={null}
       >
-        <Form form={form} onFinish={handleAddEnvironment} layout="vertical">
+        <Form
+          form={form}
+          onFinish={isEditMode ? handleEditEnvironment : handleAddEnvironment}
+          layout="vertical"
+        >
           <Form.Item
             label="Environment Name"
             name="name"
@@ -241,7 +274,7 @@ const Settings: React.FC = () => {
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit" block>
-              Add Environment
+              {isEditMode ? "Update Environment" : "Add Environment"}
             </Button>
           </Form.Item>
         </Form>
