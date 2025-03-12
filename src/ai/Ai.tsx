@@ -7,6 +7,7 @@ import {
   SettingOutlined,
   QuestionCircleOutlined,
   AntDesignOutlined,
+  ToolOutlined,
 } from "@ant-design/icons";
 import { Button, Layout, Menu, MenuProps, theme } from "antd";
 import AiRoutes from "./AiRoutes";
@@ -83,7 +84,7 @@ const Ai = () => {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if(window.location.pathname === "/help"){
+      if (window.location.pathname === "/help") {
         event.preventDefault();
         return;
       }
@@ -123,34 +124,56 @@ const Ai = () => {
                 />
               </a>
             </div>
-            <Menu
-              theme="dark"
-              mode="inline"
-              selectedKeys={[current]}
-              onClick={onClick}
-              items={[
-                {
-                  key: "playground-ai",
-                  icon: <AntDesignOutlined />,
-                  label: "AI Playground",
-                },
-                {
-                  key: "roles",
-                  icon: <UserOutlined />,
-                  label: "Ai Roles",
-                },
-                {
-                  key: "tools",
-                  icon: <SettingOutlined />,
-                  label: "Ai Tools",
-                },
-                {
-                  key: "agents",
-                  icon: <ThunderboltOutlined />,
-                  label: "Ai Agents",
-                },
-              ]}
-            />
+            <div
+              style={{
+                display: "flex",
+                height: "Calc(100% - 75px)",
+                flexDirection: "column",
+                justifyContent: "space-between",
+              }}
+            >
+              <Menu
+                theme="dark"
+                mode="inline"
+                selectedKeys={[current]}
+                onClick={onClick}
+                items={[
+                  {
+                    key: "playground-ai",
+                    icon: <AntDesignOutlined />,
+                    label: "AI Playground",
+                  },
+                  {
+                    key: "roles",
+                    icon: <UserOutlined />,
+                    label: "Ai Roles",
+                  },
+                  {
+                    key: "tools",
+                    icon: <ToolOutlined />,
+                    label: "Ai Tools",
+                  },
+                  {
+                    key: "agents",
+                    icon: <ThunderboltOutlined />,
+                    label: "Ai Agents",
+                  },
+                ]}
+              />
+              <Menu
+                theme="dark"
+                mode="inline"
+                selectedKeys={[current]}
+                onClick={onClick}
+                items={[
+                  {
+                    key: "settings-ai",
+                    icon: <SettingOutlined />,
+                    label: "Settings",
+                  },
+                ]}
+              />
+            </div>
           </Sider>
         )}
         <Layout>

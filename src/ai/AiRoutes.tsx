@@ -4,6 +4,7 @@ import ToolPage from "./pages/ToolPage";
 import SystemRolePage from "./pages/SystemRolePage";
 import AiAgentList from "./pages/ai-agents/AiAgentList";
 import HelpBrowser from "./components/help/HelpBrowser";
+import Settings from "./pages/settings/Settings";
 
 const AiRoutes = () => {
   return (
@@ -45,6 +46,14 @@ const AiRoutes = () => {
         element={
           <>
             <SystemRolePage />
+          </>
+        }
+      />
+      <Route
+        path={"/settings-ai"}
+        element={
+          <>
+            <Settings />
           </>
         }
       />

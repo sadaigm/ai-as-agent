@@ -191,4 +191,52 @@ The objective of the AI Agents page is to enable users to create, view, edit, an
 Users can create multiple agents and manage them efficiently using the AI Agents page. This allows users to handle various tasks and scenarios by configuring different agents.
     `,
   },
+  "settings-ai": {
+    title: "Settings",
+    content: `
+The Settings page allows users to add, edit, and delete environments of type AI or Tool (REST API details). This helps users configure API keys or tool headers to authorize APIs.
+
+### Objective
+
+The objective of the Settings page is to enable users to manage environments that define the configuration for AI or Tool integrations.
+
+### Steps to Use
+
+1. **Navigate to Settings**:
+   - Click on the side navigation menu item labeled "Settings".
+
+2. **Add Environment**:
+   - Click on the "Add Environment" button to create a new environment.
+   - Provide a name, host URL, and type (AI or Tool) for the environment.
+   - Configure the environment by setting headers (key-value pairs) for API authorization.
+   - Save the environment to add it to the list of available environments.
+
+3. **Edit Environment**:
+   - View the list of existing environments.
+   - Click on the "Edit" button next to an environment to update its details.
+   - Update the environment's name, host URL, type, and headers as needed.
+   - Save the changes to update the environment.
+
+4. **Delete Environment**:
+   - Select an environment from the list.
+   - Click on the "Delete" button to remove the environment from the list.
+   - Confirm the deletion to permanently remove the environment.
+
+### Environment Configuration
+
+Each environment can have a name, host URL, type (AI or Tool), and headers (key-value pairs) for API authorization. Users can define the environment's parameters to integrate with AI or external tools.
+
+### Example Environment Configuration
+
+As an example, an environment for an AI service can be configured with the following details:
+- **Name**: My AI Service
+- **Host URL**: https://api.myaiservice.com
+- **Type**: AI
+- **Headers**: 
+  - **API-Key**: abc123
+  - **Authorization**: Bearer token
+
+Users can add similar environments to configure different AI services or tools for their AI agents.
+    `,
+  },
 };
