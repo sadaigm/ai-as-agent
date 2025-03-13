@@ -6,6 +6,8 @@ import { useSubmitHandler } from "../../hooks/useSubmitHandler";
 import ParameterList from "./ParameterList";
 import { parseResponse } from "../../components/response/response-utils";
 import { GetToolIcon } from "./ui/GetToolLabel";
+import SelectEnvironment from "../../components/agent-ui/SelectEnvironment";
+import { Environment } from "../../components/types/environment";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -106,6 +108,8 @@ const EditTool: FC<EditToolProps> = ({
           },
           method: values.method,
           url: values.url,
+          apiPath: values.apiPath,
+          environmentId: values.environmentId,
           bodyType: values.bodyType,
         };
         if(!updatedTool.id){
@@ -194,11 +198,56 @@ const EditTool: FC<EditToolProps> = ({
               </Select>
             </Form.Item>
             <Form.Item
+              name="environmentId"
+              label="Environment"
+              rules={[{ required: false, message: "Please select the method!" }]}
+            >
+              <SelectEnvironment
+                envType="Tool"
+                defaultValue={tool.environmentId}
+                onChange={(value: string, env: Environment) => {
+                  if (value === "") {
+                    form.setFieldValue("url", undefined);
+                    form.setFieldValue("environmentId", undefined);
+                  } else {
+                    form.setFieldValue("url", env.hostUrl);
+                    form.setFieldValue("environmentId", value);
+                  }
+                }}
+              />
+            </Form.Item>
+
+            <Form.Item
               name="url"
               label="URL"
               rules={[
                 { required: true, message: "Please input the URL!" },
                 { type: "url", message: "Please enter a valid URL!" },
+                {
+                  validator: (_, value) =>
+                  value && value.endsWith("/")
+                    ? Promise.reject(new Error("URL should not end with a '/'"))
+                    : Promise.resolve(),
+                },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="apiPath"
+              label="API Path"
+              rules={[
+                { required: true, message: "Please input the Api Path!" },
+                { type: "string", message: "Please enter a valid Api Path!" },
+                {
+                  validator: (_, value) =>
+                  value && value.startsWith("/")
+                    ? 
+                    Promise.resolve()
+                    :
+                    Promise.reject(new Error("URL should not end with a '/'")),
+                     
+                },
               ]}
             >
               <Input />

@@ -23,6 +23,8 @@ export interface Tool {
   toolName: string;
   method?: 'GET'|'POST';
   url?: string;
+  apiPath?: string;
+  environmentId?: string;
   bodyType?: 'JSON'|'STRING'|'FORM';
 }
 
@@ -64,7 +66,7 @@ const ToolItem: React.FC<ToolItemProps> = ({ tool, onEdit, onDelete }) => {
     }
     >
       {tool.type === 'rest' && <p>
-        <strong>{tool.method} :</strong> {tool.url}
+        <strong>{tool.method} :</strong> <>{`${tool.url}${tool.apiPath}`}</>
       </p>}
       <p>
         <strong>Description:</strong> {tool.function.description}

@@ -1,3 +1,4 @@
+import { Environment } from "../../components/types/environment";
 import { Tool } from "../../components/types/tool";
 import { authHeaders } from "../../const";
 import {
@@ -10,23 +11,30 @@ class RestToolFunction implements AgentToolFunction {
   toolName: string;
   toolInstance: Tool;
   authHeader: any = {};
-  constructor(id: string, toolName: string, toolInstance: Tool) {
+  constructor(id: string, toolName: string, toolInstance: Tool, env: Environment|undefined) {
     this.id = id;
     this.toolName = toolName;
     this.toolInstance = toolInstance;
-    const currentAuth: any = authHeaders.filter(
-      (a) => a[toolName] != undefined
-    );
-    console.log({currentAuth, authHeaders})
-    if (currentAuth && currentAuth[0]) {
-        const auth = currentAuth[0];
-        if(auth && auth[toolName] && auth[toolName].token) {
-            console.log(auth[toolName])
-            this.authHeader = {
-                'Gmheader': `Bearer ${auth[toolName].token}`,
-            };
-        }        
+    if(env) {
+      env.headers.forEach((header) => {
+        this.authHeader[header.key] = header.value;
+      });
     }
+    else {
+      const currentAuth: any = authHeaders.filter(
+        (a) => a[toolName] != undefined
+      );
+      console.log({currentAuth, authHeaders})
+      if (currentAuth && currentAuth[0]) {
+          const auth = currentAuth[0];
+          if(auth && auth[toolName] && auth[toolName].token) {
+              console.log(auth[toolName])
+              this.authHeader = {
+                  'Gmheader': `Bearer ${auth[toolName].token}`,
+              };
+          }        
+      }  
+    }    
   }
 
   async fetchData(url: string, method: string, body: any): Promise<any> {
@@ -61,14 +69,14 @@ class RestToolFunction implements AgentToolFunction {
     );
     console.log({ toolInstance: this.toolInstance });
 
-    const { method, url } = this.toolInstance;
+    const { method, url, apiPath } = this.toolInstance;
     let contentObj: any = {};
 
-    if (url && method) {
+    if (url && method && apiPath) {
       const bodyObject = {};
-
+      const apiFullPath = `${url}${apiPath}`;
       try {
-        const data = await this.fetchData(url, method, bodyObject);
+        const data = await this.fetchData(apiFullPath, method, bodyObject);
         console.log(data);
         contentObj.content = data;
       } catch (error: any) {
