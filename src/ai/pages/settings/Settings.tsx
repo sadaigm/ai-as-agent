@@ -56,6 +56,7 @@ const Settings: React.FC = () => {
 
   const handleAddEnvironment = (values: any) => {
     const newEnvironment = {
+      id: Math.random().toString(36).substr(2, 9),
       name: values.name,
       hostUrl: values.hostUrl,
       type: values.type,
@@ -67,8 +68,10 @@ const Settings: React.FC = () => {
   };
 
   const handleEditEnvironment = (values: any) => {
+    if(!currentEnvironment) return;
     const updatedEnvironment = {
       ...currentEnvironment,
+      id: currentEnvironment?.id,
       name: values.name,
       hostUrl: values.hostUrl,
       type: values.type,
@@ -140,7 +143,7 @@ const Settings: React.FC = () => {
               ) : (
                 <ApiOutlined style={{ color: "#03A9F4" }} />
               )}
-              <span style={{ marginLeft: "5px" }}>{`${env.name}`}</span>
+              <span style={{ marginLeft: "5px" }}>{`${env.type}`}</span>
             </Descriptions.Item>
             <Descriptions.Item label="Headers">
               <ul>
@@ -206,7 +209,15 @@ const Settings: React.FC = () => {
           <Form.Item
             label="Host URL"
             name="hostUrl"
-            rules={[{ required: true, message: "Please input the host URL!" }]}
+            rules={[{ required: true, message: "Please input the host URL!" },
+              { type: "url", message: "Please enter a valid URL!" },
+              {
+                validator: (_, value) =>
+                value && value.endsWith("/")
+                  ? Promise.reject(new Error("URL should not end with a '/'"))
+                  : Promise.resolve(),
+              },
+            ]}
           >
             <Input />
           </Form.Item>
@@ -222,7 +233,7 @@ const Settings: React.FC = () => {
           >
             <Select placeholder="Select environment type">
               <Select.Option value="AI">AI</Select.Option>
-              <Select.Option value="Tools">Tools</Select.Option>
+              <Select.Option value="Tool">Tool</Select.Option>
             </Select>
           </Form.Item>
           <Form.Item label="Customer Header Params" name="headers">

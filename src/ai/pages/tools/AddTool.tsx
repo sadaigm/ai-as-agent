@@ -4,6 +4,8 @@ import { Parameter, Tool } from "./ToolItem";
 import { ChatPayload } from "../../components/types/tool";
 import { useSubmitHandler } from "../../hooks/useSubmitHandler";
 import ParameterList from "./ParameterList";
+import SelectEnvironment from "../../components/agent-ui/SelectEnvironment";
+import { Environment } from "../../components/types/environment";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -52,7 +54,7 @@ const AddTool: FC<AddToolProps> = ({
       temperature: 0.8,
       stream: false,
     };
-    handleSubmit(payload);   
+    handleSubmit(payload);
   };
 
   useEffect(() => {
@@ -80,6 +82,8 @@ const AddTool: FC<AddToolProps> = ({
           method: values.method,
           url: values.url,
           bodyType: values.bodyType,
+          apiPath: values.apiPath,
+          environmentId: values.environmentId,
         };
         saveTool(newTool);
         setIsModalVisible(false);
@@ -154,22 +158,26 @@ const AddTool: FC<AddToolProps> = ({
       onCancel={handleCancel}
       width={800}
     >
-      <Form form={form} layout="vertical" onValuesChange={() => {
-        const fields = form.getFieldsValue([
-          "paramName",
-          "paramType",
-          "paramDescription",
-          "paramRequired",
-          "paramEnum",
-        ]);
-        setParamFieldsFilled(
-          fields.paramName ||
-            fields.paramType ||
-            fields.paramDescription ||
-            fields.paramRequired ||
-            fields.paramEnum
-        );
-      }}>
+      <Form
+        form={form}
+        layout="vertical"
+        onValuesChange={() => {
+          const fields = form.getFieldsValue([
+            "paramName",
+            "paramType",
+            "paramDescription",
+            "paramRequired",
+            "paramEnum",
+          ]);
+          setParamFieldsFilled(
+            fields.paramName ||
+              fields.paramType ||
+              fields.paramDescription ||
+              fields.paramRequired ||
+              fields.paramEnum
+          );
+        }}
+      >
         <Form.Item
           name={["function", "name"]}
           label="Function Name"
@@ -226,12 +234,48 @@ const AddTool: FC<AddToolProps> = ({
                 <Option value="POST">POST</Option>
               </Select>
             </Form.Item>
+
+            <Form.Item
+              name="environmentId"
+              label="Environment"
+              rules={[{ required: false, message: "Please select the method!" },
+              ]}
+            >
+              <SelectEnvironment
+                onChange={(value: string, env: Environment) => {
+                  if (value === "") {
+                    form.setFieldValue("url", undefined);
+                    form.setFieldValue("environmentId", undefined);
+                  } else {
+                    form.setFieldValue("url", env.hostUrl);
+                    form.setFieldValue("environmentId", value);
+                  }
+                }}
+              />
+            </Form.Item>
+
             <Form.Item
               name="url"
               label="URL"
               rules={[
-                { required: true, message: "Please input the URL!" },
-                { type: "url", message: "Please enter a valid URL!" },
+              { required: true, message: "Please input the URL!" },
+              { type: "url", message: "Please enter a valid URL!" },
+              {
+                validator: (_, value) =>
+                value && value.endsWith("/")
+                  ? Promise.reject(new Error("URL should not end with a '/'"))
+                  : Promise.resolve(),
+              },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="apiPath"
+              label="API Path"
+              rules={[
+                { required: true, message: "Please input the Api Path!" },
+                { type: "url", message: "Please enter a valid Api Path!" },
               ]}
             >
               <Input />

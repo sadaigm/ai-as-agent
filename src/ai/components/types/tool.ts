@@ -24,6 +24,8 @@ export interface Tool {
   id: string;
   toolName: string;
   method?: 'GET'|'POST';
+  apiPath?: string;
+  environmentId?: string;
   url?: string;
   bodyType?: 'JSON'|'STRING'|'FORM';
   query? :string[]

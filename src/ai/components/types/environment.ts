@@ -1,4 +1,5 @@
 export interface Environment {
+  id: string;
   name: string;
   hostUrl: string;
   type: string;

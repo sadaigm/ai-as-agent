@@ -27,7 +27,7 @@ const ImportToolPage: React.FC<ImportToolProps> = ({
           const host = swaggerJson.host || 'localhost:8080';
           const basePath = swaggerJson.basePath || "/v1";
           const schema = swaggerJson.schemes?.find((s: string) => s === "http") || "http";
-          const hostPath = `${schema}://${host}${basePath}`;
+          const hostPath = `${schema}://${host}`;
 
           const newTools = Object.keys(swaggerJson.paths).map((path) => {
             const pathItem = swaggerJson.paths[path];
@@ -46,7 +46,9 @@ const ImportToolPage: React.FC<ImportToolProps> = ({
               id: Math.random().toString(36).substr(2, 9),
               toolName: operation.summary,
               method: method.toUpperCase() as "GET" | "POST",
-              url: `${hostPath}${path}`,
+              url: `${hostPath}`,
+              apiPath: `${basePath}${path}`.replace("//", "/"),
+              environmentId: undefined,
               body: getBodyParams(operation.parameters) || [],
               query: getQueryParams(operation.parameters) || []
             } as Tool;
@@ -117,10 +119,11 @@ const ImportToolPage: React.FC<ImportToolProps> = ({
                 onChange={(e) => handleToolSelection(tool.id, e.target.checked)}
               >
                 <List.Item.Meta
-                  title={<a href={tool.url}>{tool.toolName}</a>}
+                  title={<a href={`${tool.url}${tool.apiPath}`}>{tool.toolName}</a>}
                   description={
                     <>
                       <p>{tool.url}</p>
+                      <p>{tool.apiPath}</p>
                       <p>{tool.function.description}</p>
                     </>
                   }
