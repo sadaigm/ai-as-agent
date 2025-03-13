@@ -275,7 +275,7 @@ const AddTool: FC<AddToolProps> = ({
               label="API Path"
               rules={[
                 { required: true, message: "Please input the Api Path!" },
-                { type: "url", message: "Please enter a valid Api Path!" },
+                { type: "string", message: "Please enter a valid Api Path!" },
               ]}
             >
               <Input />
