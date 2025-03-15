@@ -276,6 +276,15 @@ const AddTool: FC<AddToolProps> = ({
               rules={[
                 { required: true, message: "Please input the Api Path!" },
                 { type: "string", message: "Please enter a valid Api Path!" },
+                {
+                  validator: (_, value) =>
+                  value && value.startsWith("/")
+                    ? 
+                    Promise.resolve()
+                    :
+                    Promise.reject(new Error("URL should start with a '/'")),
+                     
+                },
               ]}
             >
               <Input />

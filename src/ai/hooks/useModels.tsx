@@ -1,6 +1,7 @@
 import { message } from "antd";
 import { useEffect, useState } from "react";
 import { HOST_URL_VERSION_PATH } from "../const";
+import { getDefaultAI } from "../utils/service";
 
 export const useModels = () => {
     const [models, setModels] = useState([]);
@@ -8,7 +9,13 @@ export const useModels = () => {
   useEffect(() => {
     const fetchModels = async () => {
       try {
-        const response = await fetch(HOST_URL_VERSION_PATH + "/models");
+        let aiHosrUrl = `${HOST_URL_VERSION_PATH}`;
+        const env = getDefaultAI();
+        if (env) {
+          aiHosrUrl = `${env.hostUrl}${env.appBasePath||""}`;
+        }
+        console.log("fetching models from", aiHosrUrl);
+        const response = await fetch(aiHosrUrl + "/models");
         const data = await response.json();
         if (data && data.data) {
           setModels(data.data); // Set models in state

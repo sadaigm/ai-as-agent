@@ -50,7 +50,9 @@ const AddSystemRole: FC<AddRoleModalProps> = ({
             role: "user",
             content: `Write a role descrtion for the Role:  ${currentRoleName}, consider what unique skills this position demands. 
             Reflect on the latest tools and technologies relevant to the field. Identify key professional experiences that align with the role's challenges. 
-            Emphasize soft skills that enhance teamwork and communication. Lastly, pinpoint the core responsibilities and expected outcomes that define success in this position.
+            Emphasize soft skills that enhance teamwork and communication. 
+            ${editingRole?.systemPrompt ? `The previous description was: ${editingRole.systemPrompt}` : ""}
+            Lastly, pinpoint the core responsibilities and expected outcomes that define success in this position.
             Could you please provide the Summary/Description in 5 lines`,
           },
         ],
@@ -103,6 +105,7 @@ const AddSystemRole: FC<AddRoleModalProps> = ({
     setIsModalVisible(false);
     form.resetFields();
     setEditingRole(null);
+    abortController?.abort();
   };
 
   return (

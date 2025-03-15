@@ -64,7 +64,7 @@ const EditTool: FC<EditToolProps> = ({
     const payload: ChatPayload = {
       model: localStorage.getItem("selectedModel") || "llama-3.2-1b-instruct",
       messages: [
-        { role: "system", content: "You are a Document writer." },
+        { role: "system", content: "You are a API Document writer." },
         {
           role: "user",
           content: `write a single line tool description for the toolname: ${toolName} so the user will understand what the tool does. ${paramString}. return only the description in simple text don't add any other information `,
@@ -245,7 +245,7 @@ const EditTool: FC<EditToolProps> = ({
                     ? 
                     Promise.resolve()
                     :
-                    Promise.reject(new Error("URL should not end with a '/'")),
+                    Promise.reject(new Error("URL should start with a '/'")),
                      
                 },
               ]}
