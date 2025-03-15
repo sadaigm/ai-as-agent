@@ -1,11 +1,17 @@
 import { ChatPayload } from "../components/types/tool";
 import { HOST_URL_VERSION_PATH } from "../const";
+import { getDefaultAI } from "../utils/service";
 
 class ChatService {
     apiBase:string;
 
     constructor(){
-        this.apiBase = `${HOST_URL_VERSION_PATH}`;
+      const env = getDefaultAI();
+      if(!env){
+                this.apiBase = `${HOST_URL_VERSION_PATH}`;
+      }else{
+        this.apiBase = `${env.hostUrl}${env.appBasePath||""}`;
+      }
     }
 
     async invoke(payload: ChatPayload, controller: AbortController) {

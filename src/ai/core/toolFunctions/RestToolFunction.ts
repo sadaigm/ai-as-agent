@@ -59,7 +59,12 @@ class RestToolFunction implements AgentToolFunction {
       );
     }
 
-    return await response.json();
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      return await response.json();
+    } else {
+      return await response.text();
+    }
   }
 
   async execute(params: any): Promise<AgentToolFunctionResponse> {
@@ -68,13 +73,28 @@ class RestToolFunction implements AgentToolFunction {
       { params }
     );
     console.log({ toolInstance: this.toolInstance });
-
+    let queryParams ="";
     const { method, url, apiPath } = this.toolInstance;
+
+    if(Object.keys(params).length> 0){
+      queryParams = Object.keys(params).map((key) => {
+        return `${key}=${params[key]}`;
+      }
+      ).join("&");
+      if(apiPath?.includes("?")){
+        queryParams = `&${queryParams}`;
+      }
+      else{
+        queryParams = `?${queryParams}`;
+      }
+    }
+
+    
     let contentObj: any = {};
 
     if (url && method && apiPath) {
       const bodyObject = {};
-      const apiFullPath = `${url}${apiPath}`;
+      const apiFullPath = `${url}${apiPath}${queryParams}`;
       try {
         const data = await this.fetchData(apiFullPath, method, bodyObject);
         console.log(data);

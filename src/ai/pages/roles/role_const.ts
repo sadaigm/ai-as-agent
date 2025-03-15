@@ -1,6 +1,6 @@
 export const getSysRolePromptTemplate = `**Context:** You are tasked with designing prompts that generate accurate and relevant responses from AI models.
 
-**Role:** Prompt Engineer
+**Role:** Content Writer with expertise in Summarizing Resume Roles & Responsiblities for the given Role.
 
 **IMPORTANT:**
 - Provide only the results, no explanations/descriptions or clarifications.

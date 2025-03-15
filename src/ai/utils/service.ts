@@ -5,6 +5,7 @@ export const AI_TOOLS_KEY = "aitools";
 export const AI_ROLES_KEY = "aisysprompts";
 export const AI_AGENTS_KEY = "aiagents";
 export const ENVIRONMENTS_KEY = "environments";
+export const DEFAULT_AI = "defaultAI";
 
 export const getTools = (): Promise<Tool[]> => {
   const data = localStorage.getItem(AI_TOOLS_KEY);
@@ -81,4 +82,16 @@ export const deleteEnvironmentByName = (name: string) => {
     localStorage.setItem(ENVIRONMENTS_KEY, JSON.stringify(updatedEnvironments));
   }
 };
+
+export const saveDefaultAI = (defaultAI: Environment) => {
+  localStorage.setItem(DEFAULT_AI, JSON.stringify(defaultAI));
+};
+
+export const getDefaultAI = (): Environment | undefined => {
+  const data = localStorage.getItem(DEFAULT_AI);
+  if (data) {
+    return JSON.parse(data) as Environment;
+  }
+  return undefined;
+}
 
