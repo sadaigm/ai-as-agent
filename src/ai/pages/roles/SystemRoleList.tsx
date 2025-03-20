@@ -29,7 +29,9 @@ const SystemRolePromptCard: React.FC<SystemRolePromptCardProps> = ({
       style={{ marginBottom: "16px" }}
       extra={
         <>
-          <Button icon={<EditOutlined />} onClick={() => onEdit(systemRolePrompt)}>Edit</Button>
+          <Button icon={<EditOutlined />} onClick={() => onEdit(systemRolePrompt)}>
+          {/* Edit */}
+          </Button>
             <Button
             icon={<DeleteOutlined />}
             onClick={() => {
@@ -40,12 +42,15 @@ const SystemRolePromptCard: React.FC<SystemRolePromptCardProps> = ({
             }}
             style={{ marginLeft: "8px" }}
             >
-            Delete
+            {/* Delete */}
             </Button>
         </>
       }
     >
       <div>
+        <p>
+          <strong>Role:</strong> {systemRolePrompt.systemRole}
+        </p>
         <p>
           <strong>ID:</strong> {systemRolePrompt.id}
         </p>
