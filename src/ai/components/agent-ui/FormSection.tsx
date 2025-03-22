@@ -18,12 +18,13 @@ import {
   SearchOutlined,
   PlusOutlined,
   DeleteOutlined,
+  ToolOutlined,
 } from "@ant-design/icons";
 import {
   getSystemPromptTemplates as getRoleSystemPromptTemplates,
   getTools,
 } from "../../utils/service";
-import { getFuncParamsString } from "../../utils/function";
+import { getFuncParamsString, getToolFullDescription } from "../../utils/function";
 import {
   ChatHistory,
   SystemRolePrompt,
@@ -91,6 +92,7 @@ const FormSection: React.FC<FormSectionProps> = ({
   const [sysPromptList, setsysPromptList] = useState<SystemRolePrompt[]>([]);
   const [availableTools, setAvailableTools] = useState<Tool[]>([]);
   const [allTools, setAllTools] = useState<Tool[]>([]);
+  const [isToolModalVisible, setIsToolModalVisible] = useState(false); // State for tool modal
   const { models } = useModels();
 
   useEffect(() => {
@@ -135,7 +137,7 @@ const FormSection: React.FC<FormSectionProps> = ({
     handleSubmit(payload);
   };
 
-  const handleAddTool = (tool: Tool|null) => {
+  const handleAddTool = (tool: Tool | null) => {
     if (selectedTool) {
       const updatedTools = [...tools, selectedTool];
       const agentTools = convertTools2AgentTools(updatedTools);
@@ -169,7 +171,7 @@ const FormSection: React.FC<FormSectionProps> = ({
   const onToolChange = (tools: Tool[]) => {
     const agentTools = convertTools2AgentTools(tools);
     form.setFieldValue("tools", agentTools);
-  }
+  };
 
   const handleCancel = () => {
     if (abortController) {
@@ -201,6 +203,22 @@ const FormSection: React.FC<FormSectionProps> = ({
       sysPromptData.systemRole === "";
     setsysPromptDisabled(status);
   }, [sysPromptData]);
+
+  const showToolModal = () => {
+    setIsToolModalVisible(true);
+  };
+
+  const handleToolModalCancel = () => {
+    setIsToolModalVisible(false);
+  };
+
+  const insertToolIntoPrompt = (tool: Tool) => {
+    const toolContent = getToolFullDescription(tool);
+    console.log(toolContent);
+    const currentPrompt = form.getFieldValue("userPrompt") || "";
+    form.setFieldValue("userPrompt", `${currentPrompt} \n${toolContent}`);
+    setIsToolModalVisible(false);
+  };
 
   return (
     <Form
@@ -252,11 +270,13 @@ const FormSection: React.FC<FormSectionProps> = ({
           label="Model"
           name="model"
           rules={[{ required: true, message: "Please select a model" }]}
-          >
-          <GetAIModel onChange={(v) => {
-            console.log({ v });
-            form.setFieldValue("model", v);
-          }} />
+        >
+          <GetAIModel
+            onChange={(v) => {
+              console.log({ v });
+              form.setFieldValue("model", v);
+            }}
+          />
         </Form.Item>
 
         <Form.Item label="Select AI Role" name="systemRoleTemplate" rules={[]}>
@@ -351,13 +371,29 @@ const FormSection: React.FC<FormSectionProps> = ({
           </Button>
         </div>
 
-        <Form.Item
-          label="User Prompt"
-          name="userPrompt"
-          rules={[{ required: true, message: "Please input user prompt" }]}
-        >
-          <TextArea placeholder="Enter user prompt" rows={4} />
-        </Form.Item>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <Form.Item
+          style={{ marginBottom: 0 }}
+            label="User Prompt"
+            name="userPrompt"
+            rules={[{ required: true, message: "Please input user prompt" }]}
+          >
+            <TextArea
+              placeholder="Enter user prompt"
+              rows={4}
+              style={{ flex: 1 }}
+            />
+          </Form.Item>
+          <div style={{ display: "flex", backgroundColor:"#00152924", padding:"0", justifyContent: "end", border: "1px solid #f0f0f0", borderRadius: "5px" }}>
+            <Button
+              size="small"
+              type="text"
+              icon={<ToolOutlined />}
+              onClick={showToolModal}
+              style={{ marginLeft: 8 }}
+            />
+          </div>
+        </div>
 
         <Form.Item
           label="Temperature"
@@ -373,25 +409,48 @@ const FormSection: React.FC<FormSectionProps> = ({
           />
         </Form.Item>
 
-        <Form.Item name="stream" valuePropName="checked">
-          <Checkbox>Stream</Checkbox>
-        </Form.Item>
+        <div style={{ display: "flex", justifyContent: "start" }}>
+          <Form.Item name="stream" valuePropName="checked">
+            <Checkbox>Stream</Checkbox>
+          </Form.Item>
+        </div>
         <Divider />
 
         <Typography.Title level={4}>Selected Tools</Typography.Title>
 
-        
         <Form.Item label="Tools" name="tools">
           {/* {GetAITools(tools, removeTool, availableTools, setAvailableTools, allTools, handleToolSelect)} */}
 
           <GetAITools onChange={onToolChange} />
         </Form.Item>
       </Card>
-      
+
+      <Modal
+        title="Select Tool"
+        visible={isToolModalVisible}
+        onCancel={handleToolModalCancel}
+        footer={null}
+      >
+        <List
+          dataSource={availableTools}
+          renderItem={(item) => (
+            <List.Item
+              actions={[
+                <Button type="link" onClick={() => insertToolIntoPrompt(item)}>
+                  Insert
+                </Button>,
+              ]}
+            >
+              <List.Item.Meta
+                title={item.function.name}
+                description={item.function.description}
+              />
+            </List.Item>
+          )}
+        />
+      </Modal>
     </Form>
   );
 };
 
 export default FormSection;
-
-
