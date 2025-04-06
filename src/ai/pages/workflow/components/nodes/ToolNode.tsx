@@ -12,7 +12,7 @@ const ToolNode = (props: any) => {
   return (
     <div
       style={{
-        padding: "10px",
+        // padding: "10px",
         border: "1px solid #52c41a",
         borderRadius: "5px",
         background: "#f6ffed",

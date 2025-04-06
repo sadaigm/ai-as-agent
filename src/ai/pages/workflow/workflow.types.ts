@@ -9,3 +9,12 @@ export type WorkflowNode = {
         y: number;
     }
 }
+
+export type Workflow  = {
+    nodes: WorkflowNode[];
+    edges: any[];
+    id: string;
+    name: string;
+    description: string;   
+    mappings: any[]
+}

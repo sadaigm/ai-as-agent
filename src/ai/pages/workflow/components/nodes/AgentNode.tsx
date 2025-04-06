@@ -18,7 +18,7 @@ const AgentNode = (props: any) => {
     <div
       key={direction}
       style={{
-        padding: "10px",
+        // padding: "10px",
         border: "1px solid #1890ff",
         borderRadius: "5px",
         background: "#e6f7ff",

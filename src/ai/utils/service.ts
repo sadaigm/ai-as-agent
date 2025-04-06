@@ -1,11 +1,13 @@
 import { SystemRolePrompt, Tool, AIAgent } from "../components/types/tool";
 import { Environment } from "../components/types/environment";
+import { Workflow } from "../pages/workflow/workflow.types";
 
 export const AI_TOOLS_KEY = "aitools";
 export const AI_ROLES_KEY = "aisysprompts";
 export const AI_AGENTS_KEY = "aiagents";
 export const ENVIRONMENTS_KEY = "environments";
 export const DEFAULT_AI = "defaultAI";
+export const WORKFLOWS_KEY = "workflows";
 
 export const getTools = (): Promise<Tool[]> => {
   const data = localStorage.getItem(AI_TOOLS_KEY);
@@ -95,3 +97,40 @@ export const getDefaultAI = (): Environment | undefined => {
   return undefined;
 }
 
+
+
+// Save a workflow
+export const saveWorkflow = (workflow: Workflow) => {
+  const data = localStorage.getItem(WORKFLOWS_KEY);
+  const workflows = data ? (JSON.parse(data) as Workflow[]) : [];
+  // Check if the workflow already exists
+  const existingWorkflowIndex = workflows.findIndex(w => w.id === workflow.id);
+  if (existingWorkflowIndex !== -1) {
+    // Update the existing workflow
+    workflows[existingWorkflowIndex] = workflow;
+  } else {
+    // Add a new workflow
+    workflows.push(workflow);
+  }
+  // Save the workflow to local storage  
+  localStorage.setItem(WORKFLOWS_KEY, JSON.stringify(workflows));
+};
+
+// Get all workflows
+export const getWorkflows = (): Promise<Workflow[]> => {
+  const data = localStorage.getItem(WORKFLOWS_KEY);
+  if (data) {
+    return Promise.resolve(JSON.parse(data) as Workflow[]);
+  }
+  return Promise.resolve([] as Workflow[]);
+};
+
+// Delete a workflow by ID
+export const deleteWorkflow = (id: string) => {
+  const data = localStorage.getItem(WORKFLOWS_KEY);
+  if (data) {
+    const workflows = JSON.parse(data) as Workflow[];
+    const updatedWorkflows = workflows.filter((workflow) => workflow.id !== id);
+    localStorage.setItem(WORKFLOWS_KEY, JSON.stringify(updatedWorkflows));
+  }
+};
