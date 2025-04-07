@@ -17,4 +17,5 @@ export type Workflow  = {
     name: string;
     description: string;   
     mappings: any[]
+    gobalVariables: any;
 }

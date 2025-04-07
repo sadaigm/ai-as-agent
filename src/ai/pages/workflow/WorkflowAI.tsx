@@ -32,19 +32,33 @@ type InternalWorkflowAIProps = {
   handleClose: () => void;
   isModalVisible: boolean;
   setIsModalVisible: (visible: boolean) => void;
+  defaultWorkflow?: Workflow | null; // Optional prop for editing workflows
+  saveCallback?: () => void;
 };
 
 const InternalWorkflowAI: FC<InternalWorkflowAIProps> = ({
   handleClose,
   isModalVisible,
   setIsModalVisible,
+  defaultWorkflow,
+  saveCallback
 }) => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [isSaveModalVisible, setIsSaveModalVisible] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
-  const [workflowName, setWorkflowName] = useState("");
-  const [workflowDescription, setWorkflowDescription] = useState("");
+  const [workflowName, setWorkflowName] = useState(defaultWorkflow?.name || "");
+  const [workflowDescription, setWorkflowDescription] = useState(
+    defaultWorkflow?.description || ""
+  );
+
+  // Load nodes and edges from the defaultWorkflow if provided
+  useEffect(() => {
+    if (defaultWorkflow) {
+      setNodes(defaultWorkflow.nodes || []);
+      setEdges(defaultWorkflow.edges || []);
+    }
+  }, [defaultWorkflow]);
 
   //   const { flowStateValue , setFlowStateValue } = useWorkflow();
 
@@ -78,16 +92,18 @@ const InternalWorkflowAI: FC<InternalWorkflowAIProps> = ({
     const nodeCount = nodes.length;
     const row = Math.floor(nodeCount / NODES_PER_ROW); // Determine the row
     const col = nodeCount % NODES_PER_ROW; // Determine the column
-    const actualNodes = nodes.filter((node) => node.type=== "agentNode" || node.type=== "toolNode")
-      const isCurrentNodeSmall = data.nodeType === "startNode" || data.nodeType === "endNode";
-    const x =
-      isCurrentNodeSmall ? 100 : 0; // Horizontal position
+    const actualNodes = nodes.filter(
+      (node) => node.type === "agentNode" || node.type === "toolNode"
+    );
+    const isCurrentNodeSmall =
+      data.nodeType === "startNode" || data.nodeType === "endNode";
+    const x = isCurrentNodeSmall ? 100 : 0; // Horizontal position
     const position = {
       x,
-      y: nodeCount * ((NODE_HEIGHT ) + VERTICAL_SPACING), // Vertical position
+      y: nodeCount * (NODE_HEIGHT + VERTICAL_SPACING), // Vertical position
     };
 
-    console.log({position})
+    console.log({ position });
 
     const newNode: WorkflowNode = {
       id: `${data.nodeType}-${Date.now()}`,
@@ -113,19 +129,37 @@ const InternalWorkflowAI: FC<InternalWorkflowAIProps> = ({
       message.error("Please provide a workflow name.");
       return;
     }
+    if (defaultWorkflow) {
+      const updatedWorkflow: Workflow = {
+        ...defaultWorkflow,
+        nodes: nodes as WorkflowNode[],
+        edges,
+        name: workflowName,
+        description: workflowDescription,
+      };
+      if(!updatedWorkflow.mappings){
+        updatedWorkflow.mappings = [];
+      }
+        if(!updatedWorkflow.gobalVariables){
+            updatedWorkflow.gobalVariables = {};
+        }
+      saveWorkflow(updatedWorkflow);
+    } else {
+      const workflow: Workflow = {
+        id: `${Date.now()}`,
+        name: workflowName,
+        description: workflowDescription,
+        nodes: nodes as WorkflowNode[],
+        edges,
+        mappings: [],
+        gobalVariables: {},
+      };
+      saveWorkflow(workflow);
+    }
 
-    const workflow: Workflow = {
-      id: `${Date.now()}`,
-      name: workflowName,
-      description: workflowDescription,
-      nodes: nodes as WorkflowNode[],
-      edges,
-      mappings: [],
-    };
-
-    saveWorkflow(workflow);
     message.success("Workflow saved successfully!");
     handleFinish();
+    saveCallback && saveCallback();
   };
 
   const handleNext = () => {
@@ -164,12 +198,15 @@ const InternalWorkflowAI: FC<InternalWorkflowAIProps> = ({
         <Button onClick={handlePrevious} style={{ marginRight: "10px" }}>
           Previous
         </Button>,
-        currentStep==0?<Button type="primary" onClick={handleNext}>
-          Next
-        </Button>:
-        <Button type="primary" onClick={handleSaveWorkflow}>
-          Save Workflow
-        </Button>,
+        currentStep == 0 ? (
+          <Button type="primary" onClick={handleNext}>
+            Next
+          </Button>
+        ) : (
+          <Button type="primary" onClick={handleSaveWorkflow}>
+            Save Workflow
+          </Button>
+        ),
       ]}
       width={800}
     >

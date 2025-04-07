@@ -1,17 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { List, Card, Button, message, Modal, Input, Space, Steps } from "antd";
+import { List, Card, Button, message } from "antd";
 import { getWorkflows, deleteWorkflow } from "../../utils/service";
 import { Workflow } from "./workflow.types";
 import WorkflowAI from "./WorkflowAI";
 
-const { Step } = Steps;
-
 const WorkflowAIList: React.FC = () => {
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [workflowName, setWorkflowName] = useState("");
-  const [workflowDescription, setWorkflowDescription] = useState("");
+  const [currentWorkflow, setCurrentWorkflow] = useState<Workflow | null>(null);
 
   // Fetch workflows on component mount
   useEffect(() => {
@@ -29,36 +25,26 @@ const WorkflowAIList: React.FC = () => {
     loadWorkflows(); // Reload workflows after deletion
   };
 
-  const handleNext = () => {
-    if (currentStep === 0) {
-      if (!workflowName) {
-        message.error("Please provide a workflow name.");
-        return;
-      }
-      setCurrentStep(1);
-    }
+  const handleEdit = (workflow: Workflow) => {
+    setCurrentWorkflow(workflow); // Set the selected workflow
+    setIsModalVisible(true); // Open the modal
   };
 
-  const handlePrevious = () => {
-    setCurrentStep(currentStep - 1);
-  };
-
-  const handleFinish = () => {
-    setIsModalVisible(false);
-    setCurrentStep(0);
-    setWorkflowName("");
-    setWorkflowDescription("");
+  const handleNewWorkflow = () => {
+    setCurrentWorkflow(null); // Clear the current workflow for a new workflow
+    setIsModalVisible(true); // Open the modal
   };
 
   const handleClose = () => {
     setIsModalVisible(false);
+    setCurrentWorkflow(null); // Clear the current workflow when the modal is closed
   };
 
   return (
     <div>
       <Button
         type="primary"
-        onClick={() => setIsModalVisible(true)}
+        onClick={handleNewWorkflow}
         style={{ marginBottom: "1rem" }}
       >
         New Workflow
@@ -73,9 +59,7 @@ const WorkflowAIList: React.FC = () => {
               actions={[
                 <Button
                   type="link"
-                  onClick={() =>
-                    message.info(`Edit workflow with ID: ${workflow.id}`)
-                  }
+                  onClick={() => handleEdit(workflow)}
                 >
                   Edit
                 </Button>,
@@ -94,15 +78,15 @@ const WorkflowAIList: React.FC = () => {
         )}
       />
 
-      <>
-        {isModalVisible && (
-          <WorkflowAI
-            handleClose={handleClose}
-            isModalVisible={isModalVisible}
-            setIsModalVisible={setIsModalVisible}
-          />
-        )}
-      </>
+      {isModalVisible && (
+        <WorkflowAI
+          handleClose={handleClose}
+          isModalVisible={isModalVisible}
+          setIsModalVisible={setIsModalVisible}
+          defaultWorkflow={currentWorkflow} // Pass the selected workflow as defaultWorkflow
+          saveCallback={loadWorkflows} // Callback to refresh the workflow list after saving
+        />
+      )}
     </div>
   );
 };
