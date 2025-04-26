@@ -13,13 +13,21 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import "./response.css";
 import { parseResponse } from "./response-utils";
-
+import { AgentToolFunctionResponse } from "../../core/AgentToolFunction";
+import { UserMessage, ToolMessage } from "../types/tool";
 
 interface ResponseProps {
   responseData: string | null;
   streamingData: string | null;
   setResponseData: React.Dispatch<React.SetStateAction<string | null>>;
   setStreamingData: React.Dispatch<React.SetStateAction<string | null>>;
+  useConversation: boolean;
+  conversation: Array<UserMessage | ToolMessage | AgentToolFunctionResponse>;
+  setConversation: React.Dispatch<
+    React.SetStateAction<
+      Array<UserMessage | ToolMessage | AgentToolFunctionResponse>
+    >
+  >;
 }
 
 const PreBlock: React.FC = (props) => <pre {...props} />;
@@ -30,6 +38,9 @@ const ResponsePanel: React.FC<ResponseProps> = ({
   streamingData,
   setResponseData,
   setStreamingData,
+  useConversation,
+  conversation,
+  setConversation,
 }) => {
   const [thinkingContent, setThinkingContent] = useState<string | null>(null);
   const [parsedResponse, setParsedResponse] = useState<string | null>("");
@@ -55,6 +66,7 @@ const ResponsePanel: React.FC<ResponseProps> = ({
     setStreamingData("");
     setThinkingContent(null);
     setParsedResponse("");
+    setConversation([]);
   };
 
   const getItems: (panelStyle: CSSProperties) => CollapseProps["items"] = (
@@ -127,6 +139,45 @@ const ResponsePanel: React.FC<ResponseProps> = ({
         </Space>
       }
     >
+      {useConversation && conversation.length > 0 && (
+        <div className="response__conversation">
+          {conversation.map((msg, index) => {
+            const message = msg as any;
+            if (message.content) {
+              return message.role === "user" ? (
+                <div key={index} className={`response__message ${message.role}`}>
+                  <div style={{ marginBottom: "5px" }}>
+                    <strong style={{ textTransform: "capitalize", color: "#3f51b5" }}> 
+                      {message.role}:
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span>{message.content}</span>
+                  </div>
+                </div>
+              ) : (
+                <div key={index} className={`response__message ${message.role}`}>
+                  <div >
+                    <strong style={{ textTransform: "capitalize", color: "#607d8b" }}>
+                      {message.role}:
+                    </strong>
+                  </div>
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      pre: PreBlock,
+                      code: CodeBlock,
+                    }}
+                    children={message.content}
+                  />
+                </div>
+              );
+            }
+          })}
+        </div>
+      )}
+
       {thinkingContent ? (
         <Collapse
           bordered={false}
@@ -138,14 +189,23 @@ const ResponsePanel: React.FC<ResponseProps> = ({
           items={getItems(panelStyle)}
         />
       ) : parsedResponse ? (
-        <ReactMarkdown
-          remarkPlugins={[remarkGfm]}
-          components={{
-            pre: PreBlock,
-            code: CodeBlock,
-          }}
-          children={parsedResponse}
-        />
+        <>
+          <div >
+            <strong style={{ textTransform: "capitalize" }}>
+              {"assistant"}:
+            </strong>
+          </div>
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              pre: PreBlock,
+              code: CodeBlock,
+            }}
+            children={parsedResponse}
+          />
+        </>
+      ) : conversation.length > 0 ? (
+        <></>
       ) : (
         <Empty />
       )}

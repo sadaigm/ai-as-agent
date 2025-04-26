@@ -6,6 +6,8 @@ interface WorkflowContextType {
     setFlowStateValue: React.Dispatch<React.SetStateAction<any>>;
     nodeCallBack: (node: string) => void;
     createNewWorkflow: (workflow: Workflow) => void;
+    currentWorkflowId?: string;
+    setcurrentWorkflowId: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
 const WorkflowContext = createContext<WorkflowContextType | undefined>(undefined);
@@ -13,6 +15,7 @@ const WorkflowContext = createContext<WorkflowContextType | undefined>(undefined
 const WorkflowProvider = ({ children }: { children: ReactNode }) => {
     const [currentWorkflow, setcurrentWorkflow] = useState<Workflow|null>(null);
     const [flowStateValue, setFlowStateValue] = useState<string|null>(null);
+    const [currentWorkflowId, setcurrentWorkflowId] = useState<string | undefined>(undefined)
     const nodeCallBack = useCallback((node: string) => {
         console.log("Node callback", node);
         setFlowStateValue(node);
@@ -25,7 +28,7 @@ const WorkflowProvider = ({ children }: { children: ReactNode }) => {
       , []);
 
     return (
-        <WorkflowContext.Provider value={{ flowStateValue, setFlowStateValue, nodeCallBack, createNewWorkflow }}>
+        <WorkflowContext.Provider value={{ flowStateValue, setFlowStateValue, nodeCallBack, createNewWorkflow, currentWorkflowId, setcurrentWorkflowId }}>
             {children}
         </WorkflowContext.Provider>
     );

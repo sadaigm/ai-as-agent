@@ -2,12 +2,18 @@ import { AIAgent, Tool, ToolMessage } from "../../components/types/tool"
 
 export type WorkflowNode = {
     type: "agentNode" | "toolNode" | "start" | "end" | "decision";
-    data: AIAgent| Tool|string;
-    id: string;    
+    data: NodeData;
+    id: string;
+    
     position: {
         x: number;
         y: number;
     }
+}
+
+export type NodeData = (AIAgent| Tool|string) & {
+    input?: any;
+    output?: any;    
 }
 
 export type Workflow  = {
@@ -17,5 +23,5 @@ export type Workflow  = {
     name: string;
     description: string;   
     mappings: any[]
-    gobalVariables: any;
+    globalVariables: any;
 }

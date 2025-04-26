@@ -18,6 +18,7 @@ import WorkflowProvider, { useWorkflow } from "./components/WorkflowProvider";
 import EndNode from "./components/nodes/EndNode";
 import { message, Button, Modal, Space, Input, Steps } from "antd";
 import { saveWorkflow } from "../../utils/service";
+import WorkflowDetails from "./components/steps/WorkflowDetails";
 
 const { Step } = Steps;
 
@@ -48,6 +49,7 @@ const InternalWorkflowAI: FC<InternalWorkflowAIProps> = ({
   const [isSaveModalVisible, setIsSaveModalVisible] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [workflowName, setWorkflowName] = useState(defaultWorkflow?.name || "");
+  const [globalVariables, setGlobalVariables] = useState(defaultWorkflow?.globalVariables||{});
   const [workflowDescription, setWorkflowDescription] = useState(
     defaultWorkflow?.description || ""
   );
@@ -114,6 +116,31 @@ const InternalWorkflowAI: FC<InternalWorkflowAIProps> = ({
         direction: "left", // Default direction for new nodes
       },
     };
+    if(data.nodeType ==="agentNode" || data.nodeType ==="toolNode"){
+      if(data.nodeType ==="agentNode"){
+        newNode.data.input= {
+          userPrompt:""
+        }
+        newNode.data.output = {
+          response: "",
+          forrmat: "text",
+        };
+      }
+      else{
+        newNode.data.input = {};
+         data?.function?.parameters?.forEach( (p : any) => {
+          newNode.data.input[p.name] = "";
+         })        
+         newNode.data.output = {
+          response: "",
+          forrmat: "json",
+        }
+      }
+      console.log(data)
+      ;
+    }
+
+    console.log(newNode)
 
     setNodes((nds) => nds.concat(newNode as any));
   };
@@ -136,12 +163,13 @@ const InternalWorkflowAI: FC<InternalWorkflowAIProps> = ({
         edges,
         name: workflowName,
         description: workflowDescription,
+        globalVariables: globalVariables,
       };
       if(!updatedWorkflow.mappings){
         updatedWorkflow.mappings = [];
       }
-        if(!updatedWorkflow.gobalVariables){
-            updatedWorkflow.gobalVariables = {};
+        if(!updatedWorkflow.globalVariables){
+            updatedWorkflow.globalVariables = {};
         }
       saveWorkflow(updatedWorkflow);
     } else {
@@ -152,7 +180,7 @@ const InternalWorkflowAI: FC<InternalWorkflowAIProps> = ({
         nodes: nodes as WorkflowNode[],
         edges,
         mappings: [],
-        gobalVariables: {},
+        globalVariables: globalVariables,
       };
       saveWorkflow(workflow);
     }
@@ -181,6 +209,7 @@ const InternalWorkflowAI: FC<InternalWorkflowAIProps> = ({
     setCurrentStep(0);
     setWorkflowName("");
     setWorkflowDescription("");
+    setGlobalVariables({});
     handleClose();
   };
 
@@ -216,20 +245,27 @@ const InternalWorkflowAI: FC<InternalWorkflowAIProps> = ({
       </Steps>
 
       {currentStep === 0 && (
-        <Space direction="vertical" style={{ width: "100%" }}>
-          <Input
-            placeholder="Workflow Name"
-            value={workflowName}
-            onChange={(e) => setWorkflowName(e.target.value)}
-          />
-          <Input.TextArea
-            placeholder="Workflow Description"
-            value={workflowDescription}
-            onChange={(e) => setWorkflowDescription(e.target.value)}
-            rows={4}
-          />
-          <div style={{ textAlign: "right" }}></div>
-        </Space>
+        // <Space direction="vertical" style={{ width: "100%" }}>
+        //   <Input
+        //     placeholder="Workflow Name"
+        //     value={workflowName}
+        //     onChange={(e) => setWorkflowName(e.target.value)}
+        //   />
+        //   <Input.TextArea
+        //     placeholder="Workflow Description"
+        //     value={workflowDescription}
+        //     onChange={(e) => setWorkflowDescription(e.target.value)}
+        //     rows={4}
+        //   />
+        //   <div style={{ textAlign: "right" }}></div>
+        // </Space>
+        <WorkflowDetails
+          workflowName={workflowName}
+          setWorkflowName={setWorkflowName}
+          workflowDescription={workflowDescription}
+          setWorkflowDescription={setWorkflowDescription}
+          globalVariables={globalVariables}
+          setGlobalVariables={setGlobalVariables} />
       )}
 
       {currentStep === 1 && (
