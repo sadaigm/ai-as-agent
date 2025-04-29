@@ -50,8 +50,8 @@ const WorkflowDetails: FC<WorkflowDetailsProps> = ({
   };
 
   return (
-    <div>
-      <Space direction="vertical" style={{ width: "100%" }}>
+    <div style={{ display: "flex", height: "100%", width: "100%", border: "1px solid #ddd", padding: "10px" }}>
+      <Space direction="vertical" style={{ width: "100%", flex: 1, padding: "10px" }}>
         {/* Workflow Name and Description */}
         <Input
           placeholder="Workflow Name"

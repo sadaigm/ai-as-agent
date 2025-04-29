@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { List, Card, Button, message } from "antd";
+// import { useNavigate } from "react-router-dom";
 import { getWorkflows, deleteWorkflow } from "../../utils/service";
 import { Workflow } from "./workflow.types";
-import WorkflowAI from "./WorkflowAI";
 
 const WorkflowAIList: React.FC = () => {
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [currentWorkflow, setCurrentWorkflow] = useState<Workflow | null>(null);
+  // const navigate = useNavigate();
 
   // Fetch workflows on component mount
   useEffect(() => {
@@ -26,18 +25,11 @@ const WorkflowAIList: React.FC = () => {
   };
 
   const handleEdit = (workflow: Workflow) => {
-    setCurrentWorkflow(workflow); // Set the selected workflow
-    setIsModalVisible(true); // Open the modal
+    window.location.assign(`/workflow-ai-open/${workflow.id}`); // Navigate to the workflow editor
   };
 
   const handleNewWorkflow = () => {
-    setCurrentWorkflow(null); // Clear the current workflow for a new workflow
-    setIsModalVisible(true); // Open the modal
-  };
-
-  const handleClose = () => {
-    setIsModalVisible(false);
-    setCurrentWorkflow(null); // Clear the current workflow when the modal is closed
+    window.location.assign(`/workflow-ai-open/NEW`); // Navigate to create a new workflow
   };
 
   return (
@@ -77,16 +69,6 @@ const WorkflowAIList: React.FC = () => {
           </List.Item>
         )}
       />
-
-      {isModalVisible && (
-        <WorkflowAI
-          handleClose={handleClose}
-          isModalVisible={isModalVisible}
-          setIsModalVisible={setIsModalVisible}
-          defaultWorkflow={currentWorkflow} // Pass the selected workflow as defaultWorkflow
-          saveCallback={loadWorkflows} // Callback to refresh the workflow list after saving
-        />
-      )}
     </div>
   );
 };

@@ -15,6 +15,8 @@ import AiRoutes from "./AiRoutes";
 import { useInitData } from "./hooks/useInitData";
 import useScreenSize from "./hooks/useScreenSize";
 import { CSSProperties } from "styled-components";
+import { MenuItemType } from "antd/es/menu/interface";
+import { useParams } from "react-router-dom";
 
 const { Header, Sider, Content } = Layout;
 
@@ -30,6 +32,7 @@ const Ai = () => {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
   console.log({ screenSize });
+  const [dynamicMenus, setdynamicMenus] = useState<Array<MenuItemType>>([]);
   const [contentStyle, setcontentStyle] = useState<CSSProperties>({
     minHeight: 280,
     height: "100%",
@@ -61,9 +64,28 @@ const Ai = () => {
     }
   }, [screenSize]);
 
+  const { id } = useParams<{ id: string }>();
   const [current, setCurrent] = useState(
     window.location.pathname.replace("/", "") || "playground-ai"
   );
+
+  useEffect(() => {    
+    if(window.location.pathname.startsWith("/workflow-ai-open")) {
+      // alert(window.location.pathname);
+      const workflowId = window.location.pathname.replace("/workflow-ai-open", "workflow-ai-open");
+      setCurrent(workflowId);
+      setdynamicMenus([
+        {
+          key: workflowId,
+          icon: <PartitionOutlined />,
+          label: `${window.location.pathname.replace("/workflow-ai-open/", "")} Workflow AI `,
+        },
+      ]);
+    }
+    else{
+      setdynamicMenus([]);
+    }
+  }, [window.location.pathname]);
   const onClick: MenuProps["onClick"] = (e) => {
     console.log("click ", e);
     setCurrent(e.key);
@@ -164,6 +186,7 @@ const Ai = () => {
                     icon: <PartitionOutlined />,
                     label: "Workflow AI",
                   },
+                  ...dynamicMenus
                 ]}
               />
               <Menu
