@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import ReactFlow, {
   addEdge,
@@ -6,8 +6,6 @@ import ReactFlow, {
   Controls,
   MiniMap,
   ReactFlowProvider,
-  useEdgesState,
-  useNodesState,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import AgentNode from "./components/nodes/AgentNode";
@@ -15,10 +13,10 @@ import ToolNode from "./components/nodes/ToolNode";
 import FlowPalette from "./components/FlowPalette";
 import { Workflow, WorkflowNode } from "./workflow.types";
 import StartNode from "./components/nodes/StartNode";
-import WorkflowProvider from "./components/WorkflowProvider";
+import WorkflowProvider, { useWorkflow } from "./components/WorkflowProvider";
 import EndNode from "./components/nodes/EndNode";
 import { message, Button, Steps } from "antd";
-import { getWorkflows, saveWorkflow } from "../../utils/service";
+import { saveWorkflow } from "../../utils/service";
 import WorkflowDetails from "./components/steps/WorkflowDetails";
 
 const { Step } = Steps;
@@ -36,41 +34,28 @@ type InternalWorkflowAIProps = {
 
 const InternalWorkflowAI: FC<InternalWorkflowAIProps> = ({ workflowId }) => {
   const navigate = useNavigate();
+  const {
+    setcurrentWorkflowId,
+    workflowName,
+    setWorkflowName,
+    workflowDescription,
+    setWorkflowDescription,
+    globalVariables,
+    setGlobalVariables,
+    nodes,
+    setNodes,
+    onNodesChange,
+    edges,
+    setEdges,
+    onEdgesChange,
+    setworkflowId,
+  } = useWorkflow();
 
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [currentStep, setCurrentStep] = useState(0);
-  const [workflowName, setWorkflowName] = useState("");
-  const [workflowDescription, setWorkflowDescription] = useState("");
-  const [globalVariables, setGlobalVariables] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    if (workflowId === "NEW") {
-      // Initialize a new workflow
-      setWorkflowName("");
-      setWorkflowDescription("");
-      setNodes([]);
-      setEdges([]);
-      setGlobalVariables({});
-    } else {
-      // Load an existing workflow
-      const loadWorkflow = async () => {
-        const workflows = await getWorkflows();
-        const workflow = workflows.find((w) => w.id === workflowId);
-        if (workflow) {
-          setWorkflowName(workflow.name);
-          setWorkflowDescription(workflow.description);
-          setNodes(workflow.nodes || []);
-          setEdges(workflow.edges || []);
-          setGlobalVariables(workflow.globalVariables || {});
-        } else {
-          message.error("Workflow not found!");
-          navigate("/workflow-ai"); // Redirect to the workflow list if not found
-        }
-      };
-      loadWorkflow();
-    }
-  }, [workflowId, navigate]);
+    setworkflowId(workflowId);
+  }, [workflowId]);
 
   const handleSaveWorkflow = () => {
     if (!workflowName) {
@@ -110,100 +95,126 @@ const InternalWorkflowAI: FC<InternalWorkflowAIProps> = ({ workflowId }) => {
 
   return (
     <div
-    style={{
-      height: "100%",
-      width: "100%",
-    }}
-  >
-    <div style={{ padding: "20px",width: "100%", height: "100%", display: "flex", flexDirection: "column" }}>
-      <Steps current={currentStep} style={{ marginBottom: "20px" }}>
-        <Step title="Workflow Details" />
-        <Step title="Workflow Editor" />
-      </Steps>
+      style={{
+        height: "100%",
+        width: "100%",
+      }}
+    >
+      <div
+        style={{
+          padding: "20px",
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <Steps current={currentStep} style={{ marginBottom: "20px" }}>
+          <Step title="Workflow Details" />
+          <Step title="Workflow Editor" />
+        </Steps>
 
-      {currentStep === 0 && (
-        <div style={{ display: "flex", height: "calc(100% - 100px)", border: "1px solid #ddd", padding: "10px" }}>
-        <WorkflowDetails
-          workflowName={workflowName}
-          setWorkflowName={setWorkflowName}
-          workflowDescription={workflowDescription}
-          setWorkflowDescription={setWorkflowDescription}
-          globalVariables={globalVariables}
-          setGlobalVariables={setGlobalVariables}
-        />
-        </div>
-      )}
+        {currentStep === 0 && (
+          <div
+            style={{
+              display: "flex",
+              height: "calc(100% - 100px)",
+              border: "1px solid #ddd",
+              padding: "10px",
+            }}
+          >
+            <WorkflowDetails
+              workflowName={workflowName}
+              setWorkflowName={setWorkflowName}
+              workflowDescription={workflowDescription}
+              setWorkflowDescription={setWorkflowDescription}
+              globalVariables={globalVariables}
+              setGlobalVariables={setGlobalVariables}
+            />
+          </div>
+        )}
 
-      {currentStep === 1 && (
-        <ReactFlowProvider>
-          <div style={{ display: "flex", height: "calc(100% - 100px)",border: "1px solid #ddd", padding: "10px" }}>
-            {/* Left Panel */}
-            <FlowPalette />
-
-            {/* Right Panel */}
+        {currentStep === 1 && (
+          <ReactFlowProvider>
             <div
               style={{
-                flex: 1,
-                background: "#fff",
+                display: "flex",
+                height: "calc(100% - 100px)",
                 border: "1px solid #ddd",
-                position: "relative",
-              }}
-              onDrop={(event) => {
-                event.preventDefault();
-                const data = JSON.parse(event.dataTransfer.getData("application/reactflow"));
-                const position = {
-                  x: 0,
-                  y: nodes.length * 100, // Stack nodes vertically
-                };
-                const newNode: WorkflowNode = {
-                  id: `${data.nodeType}-${Date.now()}`,
-                  type: data.nodeType,
-                  position,
-                  data: { ...data },
-                };
-                setNodes((nds) => nds.concat(newNode));
-              }}
-              onDragOver={(event) => {
-                event.preventDefault();
-                event.dataTransfer.dropEffect = "move";
+                padding: "10px",
               }}
             >
-              <ReactFlow
-                nodes={nodes}
-                edges={edges}
-                onNodesChange={onNodesChange}
-                onEdgesChange={onEdgesChange}
-                onConnect={(params) => setEdges((eds) => addEdge(params, eds))}
-                fitView
-                nodeTypes={nodeTypes}
-              >
-                <MiniMap />
-                <Controls />
-                <Background />
-              </ReactFlow>
-            </div>
-          </div>
-        </ReactFlowProvider>
-      )}
+              {/* Left Panel */}
+              <FlowPalette />
 
-      <div style={{ marginTop: "20px", textAlign: "right" }}>
-        {currentStep > 0 && (
-          <Button onClick={handlePrevious} style={{ marginRight: "10px" }}>
-            Previous
-          </Button>
+              {/* Right Panel */}
+              <div
+                style={{
+                  flex: 1,
+                  background: "#fff",
+                  border: "1px solid #ddd",
+                  position: "relative",
+                }}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  const data = JSON.parse(
+                    event.dataTransfer.getData("application/reactflow")
+                  );
+                  const position = {
+                    x: 0,
+                    y: nodes.length * 100, // Stack nodes vertically
+                  };
+                  const newNode: WorkflowNode = {
+                    id: `${data.nodeType}-${Date.now()}`,
+                    type: data.nodeType,
+                    position,
+                    data: { ...data },
+                  };
+                  setNodes((nds) => nds.concat(newNode));
+                }}
+                onDragOver={(event) => {
+                  event.preventDefault();
+                  event.dataTransfer.dropEffect = "move";
+                }}
+              >
+                <ReactFlow
+                  nodes={nodes}
+                  edges={edges}
+                  onNodesChange={onNodesChange}
+                  onEdgesChange={onEdgesChange}
+                  onConnect={(params) =>
+                    setEdges((eds) => addEdge(params, eds))
+                  }
+                  fitView
+                  nodeTypes={nodeTypes}
+                >
+                  <MiniMap />
+                  <Controls />
+                  <Background />
+                </ReactFlow>
+              </div>
+            </div>
+          </ReactFlowProvider>
         )}
-        {currentStep === 0 ? (
-          <Button type="primary" onClick={handleNext}>
-            Next
-          </Button>
-        ) : (
-          <Button type="primary" onClick={handleSaveWorkflow}>
-            Save Workflow
-          </Button>
-        )}
+
+        <div style={{ marginTop: "20px", textAlign: "right" }}>
+          {currentStep > 0 && (
+            <Button onClick={handlePrevious} style={{ marginRight: "10px" }}>
+              Previous
+            </Button>
+          )}
+          {currentStep === 0 ? (
+            <Button type="primary" onClick={handleNext}>
+              Next
+            </Button>
+          ) : (
+            <Button type="primary" onClick={handleSaveWorkflow}>
+              Save Workflow
+            </Button>
+          )}
+        </div>
       </div>
     </div>
-  </div>
   );
 };
 

@@ -1,16 +1,15 @@
-import React from "react";
 import { Tool } from "../../../../components/types/tool";
-import { Handle } from "reactflow";
-import { ThunderboltOutlined, ToolOutlined } from "@ant-design/icons";
+import { ToolOutlined } from "@ant-design/icons";
 import SourceHandle from "../handle/SourceHandle";
 import TargetHandle from "../handle/TargetHandle";
 import { CSSProperties } from "styled-components";
 import ConfigureIO from "../transformer/ConfigureIO";
 import { NodeParams } from "../../workflow.types";
+import { useWorkflow } from "../WorkflowProvider";
 
 const ToolNode = (props: any) => {
   const tool: Tool = props.data.data;
-
+const { setcurrentWorkflowId } = useWorkflow();
   const nodeParams: NodeParams = {
     input: props.data.input,
     output: props.data.output,
@@ -36,6 +35,7 @@ const ToolNode = (props: any) => {
 
   if (props.selected) {
     toolNodeStyle.boxShadow = "0 0 6px #52c41a";
+    setcurrentWorkflowId(props.id);
   }
 
   return (

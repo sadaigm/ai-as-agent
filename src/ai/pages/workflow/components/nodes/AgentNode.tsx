@@ -1,7 +1,5 @@
-import React, { useContext, useState } from "react";
 import { AIAgent } from "../../../../components/types/tool";
-import { Handle } from "reactflow";
-import { ThunderboltOutlined, UserOutlined } from "@ant-design/icons";
+import { ThunderboltOutlined } from "@ant-design/icons";
 import { useWorkflow } from "../WorkflowProvider";
 import { getRandomColor } from "../../../../utils/ui-utils";
 import SourceHandle from "../handle/SourceHandle";
@@ -12,8 +10,10 @@ import { NodeParams } from "../../workflow.types";
 
 const AgentNode = (props: any) => {
   const agent: AIAgent = props.data.data;
-  const { currentWorkflowId, setcurrentWorkflowId } = useWorkflow();
-
+  
+  const { currentWorkflowId, setcurrentWorkflowId, currentWorkflow, edges, nodes } = useWorkflow();
+  console.log({props, currentWorkflowId, currentWorkflow, edges, nodes});
+  
   const nodeParams: NodeParams = {
     input: props.data.input,
     output: props.data.output,
