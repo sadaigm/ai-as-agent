@@ -1,4 +1,4 @@
-import { AIAgent, Tool, ToolMessage } from "../../components/types/tool"
+import { AIAgent, Tool } from "../../components/types/tool"
 
 export type WorkflowNode = {
     type: "agentNode" | "toolNode" | "start" | "end" | "decision";

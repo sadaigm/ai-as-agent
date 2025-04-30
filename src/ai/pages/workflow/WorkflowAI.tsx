@@ -35,7 +35,6 @@ type InternalWorkflowAIProps = {
 const InternalWorkflowAI: FC<InternalWorkflowAIProps> = ({ workflowId }) => {
   const navigate = useNavigate();
   const {
-    setcurrentWorkflowId,
     workflowName,
     setWorkflowName,
     workflowDescription,

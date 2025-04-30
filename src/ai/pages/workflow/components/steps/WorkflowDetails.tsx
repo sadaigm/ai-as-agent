@@ -1,6 +1,6 @@
 import { Space, Input, Card, Button, Empty, Tooltip } from "antd";
 import { DeleteOutlined, EditOutlined, CheckOutlined } from "@ant-design/icons";
-import React, { FC, useState } from "react";
+import { FC, useState } from "react";
 
 type WorkflowDetailsProps = {
   workflowName: string;
