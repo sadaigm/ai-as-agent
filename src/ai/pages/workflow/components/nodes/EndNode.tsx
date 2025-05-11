@@ -4,7 +4,7 @@ import TargetHandle from '../handle/TargetHandle';
 import { CSSProperties } from 'styled-components';
 
 const EndNode = (props: any) => {
-    const tool: any = props.data.data;
+    const tool: any = props.data.node;
     const endNodeStyle : CSSProperties = {
         height: "50px",
         width: "50px",

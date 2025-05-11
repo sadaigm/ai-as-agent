@@ -1,6 +1,6 @@
-import { Space, Input, Card, Button, Empty, Tooltip } from "antd";
+import { Space, Input, Card, Button, Empty, Tooltip, Form } from "antd";
 import { DeleteOutlined, EditOutlined, CheckOutlined } from "@ant-design/icons";
-import { FC, useState } from "react";
+import { FC, useState, useEffect } from "react";
 
 type WorkflowDetailsProps = {
   workflowName: string;
@@ -19,9 +19,15 @@ const WorkflowDetails: FC<WorkflowDetailsProps> = ({
   globalVariables,
   setGlobalVariables,
 }) => {
+  const [form] = Form.useForm(); // Create a form instance
   const [editKey, setEditKey] = useState<string | null>(null); // Track the key being edited
   const [editedKey, setEditedKey] = useState<string>(""); // Track the edited key
   const [editedValue, setEditedValue] = useState<string>(""); // Track the edited value
+
+  useEffect(() => {
+    // Update form values when workflowName or workflowDescription changes
+    form.setFieldsValue({ workflowName, workflowDescription });
+  }, [workflowName, workflowDescription, form]);
 
   const handleSave = (originalKey: string) => {
     const updatedVariables = { ...globalVariables };
@@ -50,20 +56,36 @@ const WorkflowDetails: FC<WorkflowDetailsProps> = ({
   };
 
   return (
-    <div style={{ display: "flex", height: "100%", width: "100%", border: "1px solid #ddd", padding: "10px" }}>
-      <Space direction="vertical" style={{ width: "100%", flex: 1, padding: "10px" }}>
+    <div style={{ display: "flex", height: "100%", width: "100%", padding: "10px", overflowY:"auto" }}>
+      <Space direction="vertical" style={{ width: "100%", flex: 1}}>
         {/* Workflow Name and Description */}
-        <Input
-          placeholder="Workflow Name"
-          value={workflowName}
-          onChange={(e) => setWorkflowName(e.target.value)}
-        />
-        <Input.TextArea
-          placeholder="Workflow Description"
-          value={workflowDescription}
-          onChange={(e) => setWorkflowDescription(e.target.value)}
-          rows={4}
-        />
+        <Form
+          form={form} // Bind the form instance
+          layout="vertical"
+          initialValues={{ workflowName, workflowDescription }}
+          onValuesChange={(changedValues) => {
+            if (changedValues.workflowName !== undefined) {
+              setWorkflowName(changedValues.workflowName);
+            }
+            if (changedValues.workflowDescription !== undefined) {
+              setWorkflowDescription(changedValues.workflowDescription);
+            }
+          }}
+        >
+          <Form.Item
+            label="Workflow Name"
+            name="workflowName"
+            rules={[
+              { required: true, message: "Workflow Name is required." },
+              { min: 4, message: "Workflow Name must be at least 4 characters long." },
+            ]}
+          >
+            <Input placeholder="Workflow Name" />
+          </Form.Item>
+          <Form.Item label="Workflow Description" name="workflowDescription">
+            <Input.TextArea placeholder="Workflow Description" rows={4} />
+          </Form.Item>
+        </Form>
 
         {/* Global Variables Card */}
         <Card

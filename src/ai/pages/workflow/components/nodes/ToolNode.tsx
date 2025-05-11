@@ -8,16 +8,32 @@ import { NodeParams } from "../../workflow.types";
 import { useWorkflow } from "../WorkflowProvider";
 
 const ToolNode = (props: any) => {
-  const tool: Tool = props.data.data;
-const { setcurrentWorkflowId } = useWorkflow();
+  const tool: Tool = props.data.node;
+  console.log(tool)
+const { setcurrentWorkflowId,nodes,setNodes } = useWorkflow();
   const nodeParams: NodeParams = {
     input: props.data.input,
     output: props.data.output,
   };
 
   const handleUpdateNodeData = (updatedNodeData: NodeParams) => {
-    console.log("Updated Node Data:", updatedNodeData);
+    console.log("Updated Node Data:", updatedNodeData,nodes);
     // Update the node data in the parent workflow or state
+    setNodes((prevNodes) => {
+      return prevNodes.map((node) => {
+        if (node.id === props.id) {
+          return {
+            ...node,
+            params: {
+            input: updatedNodeData.input,
+            output: updatedNodeData.output,
+            }
+          };
+        }
+        return node;
+      });
+    }
+    );
   };
 
   const toolNodeStyle: CSSProperties = {

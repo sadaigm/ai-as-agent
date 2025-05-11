@@ -101,7 +101,7 @@ const InternalWorkflowAI: FC<InternalWorkflowAIProps> = ({ workflowId }) => {
     >
       <div
         style={{
-          padding: "20px",
+          // padding: "20px",
           width: "100%",
           height: "100%",
           display: "flex",
@@ -118,8 +118,9 @@ const InternalWorkflowAI: FC<InternalWorkflowAIProps> = ({ workflowId }) => {
             style={{
               display: "flex",
               height: "calc(100% - 100px)",
-              border: "1px solid #ddd",
+              border: "1px solid #f0eaea",
               padding: "10px",
+              borderRadius: "10px",
             }}
           >
             <WorkflowDetails

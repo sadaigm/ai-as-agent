@@ -9,10 +9,9 @@ import ConfigureIO from "../transformer/ConfigureIO";
 import { NodeParams } from "../../workflow.types";
 
 const AgentNode = (props: any) => {
-  const agent: AIAgent = props.data.data;
+  const agent: AIAgent = props.data.node;
   
-  const { currentWorkflowId, setcurrentWorkflowId, currentWorkflow, edges, nodes } = useWorkflow();
-  console.log({props, currentWorkflowId, currentWorkflow, edges, nodes});
+  const { currentWorkflowId, setcurrentWorkflowId, currentWorkflow, edges, nodes,setNodes } = useWorkflow();
   
   const nodeParams: NodeParams = {
     input: props.data.input,
@@ -20,7 +19,22 @@ const AgentNode = (props: any) => {
   };
 
   const handleUpdateNodeData = (updatedNodeData: NodeParams) => {
-    console.log("Updated Node Data:", updatedNodeData);
+    console.log("Updated Node Data:", {updatedNodeData,nodes});
+    setNodes((prevNodes) => {
+      return prevNodes.map((node) => {
+        if (node.id === props.id) {
+          return {
+            ...node,
+            params: {
+            input: updatedNodeData.input,
+            output: updatedNodeData.output,
+            }
+          };
+        }
+        return node;
+      });
+    }
+    );
     // Update the node data in the parent workflow or state
   };
 
@@ -48,13 +62,14 @@ const AgentNode = (props: any) => {
     <div style={agentNodeStyle}>
       <TargetHandle />
       <div style={{ display: "flex", alignItems: "center", width: "100%" , flexDirection:"column"}} >
-        <div style={{  display:"flex", justifyContent:"center",  }}>
-        <ThunderboltOutlined style={{ color: getRandomColor() || "#2196f3",   }} />
-        </div>
         <div style={{ padding: "5px", display:"flex", flexDirection:"column" }}>
         <strong style={{ textTransform: "capitalize", fontSize: "11px" }}>
           {`${agent.name}`}
         </strong>
+        </div>
+        <div style={{ padding: "5px", display: "flex", flexDirection: "row", alignItems: "center", justifyContent:"center" }}>
+          <ThunderboltOutlined style={{ color: getRandomColor() || "#2196f3", fontSize: "16px" }} />
+          <strong style={{ textTransform: "capitalize", fontSize: "11px" }}>{`${agent.model}`}</strong>
         </div>
         
         

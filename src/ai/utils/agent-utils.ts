@@ -12,7 +12,6 @@ export const getNodes : any = (edges: any[], nodeId: string) => {
     }
     else{
       const nodes: any =  getNodes(edges, edge.source);
-      console.log({nodes})
       return [edge.source, ...nodes];
     }
 }
