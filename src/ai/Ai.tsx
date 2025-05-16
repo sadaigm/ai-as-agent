@@ -8,6 +8,7 @@ import {
   QuestionCircleOutlined,
   AntDesignOutlined,
   ToolOutlined,
+  PartitionOutlined,
 } from "@ant-design/icons";
 import { Button, Layout, Menu, MenuProps, theme } from "antd";
 import AiRoutes from "./AiRoutes";
@@ -157,6 +158,11 @@ const Ai = () => {
                     key: "agents",
                     icon: <ThunderboltOutlined />,
                     label: "Ai Agents",
+                  },
+                  {
+                    key: "workflow-ai",
+                    icon: <PartitionOutlined />,
+                    label: "Workflow AI",
                   },
                 ]}
               />
