@@ -1,0 +1,19 @@
+
+.ai__workflow-result {
+  display: flex;
+  width: 100%;
+    flex-direction: column;
+}
+.ai__workflow-result .ant-card-body {
+ max-height: 300px;
+ overflow-y: auto;
+ overflow-x: auto;
+ width: 100%;
+}
+.ai_workflow__output, .ai_workflow__output-response {
+  display: flex;
+  width: 100%;  
+}
+.ai_workflow__output-response .ant-tree-node-content-wrapper {
+  width: 90%;
+}

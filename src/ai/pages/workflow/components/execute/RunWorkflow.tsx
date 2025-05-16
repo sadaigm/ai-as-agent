@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Tree, Button, Modal, Input, message } from "antd";
-import { ThunderboltOutlined } from "@ant-design/icons";
+import { PartitionOutlined, ThunderboltOutlined } from "@ant-design/icons";
 import { Workflow, WorkflowNode } from "../../workflow.types";
 import { useSubmitHandler } from "../../../../hooks/useSubmitHandler";
 import {
@@ -11,6 +11,8 @@ import {
   Tool,
 } from "../../../../components/types/tool";
 import StatusNode from "./StatusNode";
+import WorkflowResponse from "./WorkflowResponse";
+import "./workflow.css";
 
 type RunWorkflowProps = {
   workflow: Workflow;
@@ -39,6 +41,21 @@ const RunWorkflow: React.FC<RunWorkflowProps> = ({
   const [streamingData, setStreamingData] = useState<string | null>("");
   const [abortController, setAbortController] =
     useState<AbortController | null>(null);
+  const [isWorkflowRunning, setIsWorkflowRunning] = useState(false); // Track overall workflow status
+
+  useEffect(() => {
+    const nodeIds = workflow.nodes
+      .map((node) => node.id)
+      .filter((id) => id !== undefined);
+    const status =
+      nodeIds
+        .map((id) => nodeStatuses[id] && nodeStatuses[id] === "Running")
+        .reduce((a, b) => a || b, false) || false;
+    console.log({ status });
+    setIsWorkflowRunning(status);
+    // status ? setIsWorkflowRunning(true) : setIsWorkflowRunning(false)
+  }, [nodeStatuses]);
+
   const handleSubmit = useSubmitHandler({
     setLoading,
     setResponseData,
@@ -92,13 +109,21 @@ const RunWorkflow: React.FC<RunWorkflowProps> = ({
         [currentNode?.id || ""]: "Running",
       }));
     } else {
-      setNodeStatuses((prev) => ({
-        ...prev,
-        [currentNode?.id || ""]: "Completed",
-      }));
+      setNodeStatuses((prev) => {
+        // check if the current node is running
+        if (prev[currentNode?.id || ""] === "Running") {
+          // If the current node is running, set it to completed
+          return {
+            ...prev,
+            [currentNode?.id || ""]: "Completed",
+          };
+        }
+        return prev;
+      });
       if (nodeIndex < executionOrder.length - 1) {
         setNodeIndex((prev) => prev + 1);
       }
+      setAbortController(null); // Reset abort controller
     }
   }, [loading, responseData, streamingData]);
 
@@ -269,10 +294,18 @@ const RunWorkflow: React.FC<RunWorkflowProps> = ({
         {
           title: "Output",
           key: `${node.id}.output`,
+          className: "ai_workflow__output",
           value: params?.output?.response || "",
           children: [
             {
-              title: `response : ${params?.output?.response || ""}`,
+              title: (
+                <WorkflowResponse
+                  key={`${node.id}.output.response`}
+                  response={params?.output?.response || ""}
+                  status={nodeStatuses[node.id]}
+                />
+              ),
+              className: "ai_workflow__output-response",
               key: `${node.id}.output.response`,
               value: params?.output?.response || "",
             },
@@ -299,7 +332,13 @@ const RunWorkflow: React.FC<RunWorkflowProps> = ({
 
           children: [
             {
-              title: `response : ${params?.output?.response || ""}`,
+              title: (
+                <WorkflowResponse
+                  key={`${node.id}.output.response`}
+                  response={params?.output?.response || ""}
+                  status={nodeStatuses[node.id]}
+                />
+              ),
               key: `${node.id}.output.response`,
               value: params?.output?.response || "",
             },
@@ -333,30 +372,41 @@ const RunWorkflow: React.FC<RunWorkflowProps> = ({
     )
     .map((node) => ({
       // title: `${getNodeName(node)} (${nodeStatuses[node.id]})`,
-      title: <StatusNode name={getNodeName(node)||"Unknown"} status={nodeStatuses[node.id]} />,
+      title: (
+        <StatusNode
+          name={getNodeName(node) || "Unknown"}
+          status={nodeStatuses[node.id]}
+        />
+      ),
       key: node.id,
 
       children: [
-      // Add the model name as a child node
-      ...(node.type === "agentNode"
-        ? [
-            {
-              title: "Model",
-              key: `${node.id}.model`,
-              children:[
-                {
-                  title: <span>
-                  <ThunderboltOutlined style={{ color: "#1890ff", marginRight: "5px" }} />
-                  {(node.data.node as AIAgent).model || "Unknown"}
-                </span>,
-                  key: `${node.id}.model.${(node.data.node as AIAgent).model}`,
-                }
-              ]
-            },
-          ]
-        : []),
-      ...getNodeParams(node),
-    ],
+        // Add the model name as a child node
+        ...(node.type === "agentNode"
+          ? [
+              {
+                title: "Model",
+                key: `${node.id}.model`,
+                children: [
+                  {
+                    title: (
+                      <span>
+                        <ThunderboltOutlined
+                          style={{ color: "#1890ff", marginRight: "5px" }}
+                        />
+                        {(node.data.node as AIAgent).model || "Unknown"}
+                      </span>
+                    ),
+                    key: `${node.id}.model.${
+                      (node.data.node as AIAgent).model
+                    }`,
+                  },
+                ],
+              },
+            ]
+          : []),
+        ...getNodeParams(node),
+      ],
     }));
 
   function getNodeName(currentNode: WorkflowNode | null) {
@@ -383,9 +433,22 @@ const RunWorkflow: React.FC<RunWorkflowProps> = ({
   };
   const handleCancel = () => {
     if (abortController) {
-      abortController.abort(); // Abort the fetch request if in progress
-      message.warning("Request was canceled");
-      setLoading(false); // Stop loading
+      try {
+        abortController.abort(); // Abort the fetch request if in progress
+        message.warning("Request was Cancelled");
+        setNodeStatuses((prev) => {
+          return {
+            ...prev,
+            [currentNode?.id || ""]: "Cancelled",
+          };
+        });
+        setNodeIndex(executionOrder.length); // Move to the last node
+        setLoading(false); // Stop loading
+      } catch (error: any) {
+        if (error.name !== "AbortError") {
+          console.error("Error during cancellation:", error);
+        }
+      }
     }
   };
 
@@ -393,23 +456,43 @@ const RunWorkflow: React.FC<RunWorkflowProps> = ({
     handleCancel();
     onClose();
   };
+  const getTitle = (
+    <>
+      <div>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <PartitionOutlined style={{ color: "#1890ff", marginRight: "5px" }} />
+          <span>{`Run Workflow: ${workflow?.name}`}</span>
+        </div>
+      </div>
+    </>
+  );
   return (
     <Modal
-      title={`Run Workflow: ${workflow?.name}`}
+      className="ai_workflow__run-modal fullmodel"
+      title={getTitle}
       visible={isRunModalVisible}
       onCancel={handleRunModalClose}
-      footer={null}
-      width="80%"
-    >
-      <div>
-        <Tree treeData={treeData} defaultExpandAll />
+      footer={[
         <Button
           type="primary"
           onClick={handleStartWorkflow}
-          style={{ marginTop: "20px" }}
+          disabled={isWorkflowRunning}
         >
           Start Workflow
-        </Button>
+        </Button>,
+        <>
+          {isWorkflowRunning && (
+            <Button key="stop" onClick={handleCancel}>
+              Abort
+            </Button>
+          )}
+        </>,
+      ]}
+      // width="80%"
+    >
+      <div>
+        <Tree treeData={treeData} defaultExpandAll />
+
         <Modal
           title={`Enter Parameters for ${getNodeName(currentNode)}`}
           visible={isParamModalVisible}

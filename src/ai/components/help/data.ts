@@ -239,4 +239,152 @@ As an example, an environment for an AI service can be configured with the follo
 Users can add similar environments to configure different AI services or tools for their AI agents.
     `,
   },
+  "workflow-ai": {
+    title: "AI Workflows",
+    content: `
+The AI Workflows feature allows users to create, manage, and execute complex AI pipelines by connecting AI agents and tools in a visual flow. The goal of this page is to enable the creation of sophisticated multi-step AI processes that can be saved and reused.
+
+### Objective
+
+The objective of AI Workflows is to enable users to visually design and orchestrate sequences of AI operations, combining agents and tools to perform complex tasks automatically.
+
+### Workflow List Page
+
+This page displays all your saved workflows and provides options to create, edit, execute, or delete workflows.
+
+#### Features
+
+1. **View Workflows**:
+   - See all available workflows in a card-based layout.
+   - Each card displays the workflow name and description.
+
+2. **Search Workflows**:
+   - Use the search bar to find specific workflows by name.
+   - Filtering happens automatically when you type at least 3 characters.
+
+3. **Create New Workflow**:
+   - Click the "New Workflow" button to create a fresh workflow.
+
+4. **Manage Existing Workflows**:
+   - Edit: Open a workflow in the editor to modify its configuration.
+   - Delete: Remove a workflow that is no longer needed.
+   - Execute: Run a workflow and see its results in real-time.
+
+### Workflow Editor
+
+The Workflow Editor provides a canvas where you can visually design your workflow by adding nodes and connecting them.
+
+#### Steps to Create a Workflow
+
+1. **Workflow Details**:
+   - Enter a name for your workflow (required, minimum 4 characters).
+   - Add an optional description to explain the workflow's purpose.
+   - Configure global variables that can be used across the workflow.
+
+2. **Workflow Editor Canvas**:
+   - Drag and drop nodes from the palette to the canvas.
+   - Connect nodes to define the flow sequence.
+   - Configure each node by clicking the "Configure" button.
+
+3. **Save Workflow**:
+   - Click the "Save Workflow" button to save your workflow configuration.
+
+### Node Types
+
+1. **Start Node**:
+   - The entry point of every workflow.
+   - Every workflow must have exactly one start node.
+
+2. **End Node**:
+   - Marks the completion of a workflow branch.
+   - A workflow can have multiple end nodes.
+
+3. **Agent Node**:
+   - Represents an AI agent that can process prompts and generate responses.
+   - Configure the input prompt and view the output response.
+
+4. **Tool Node**:
+   - Represents a tool that can perform specific actions or fetch data.
+   - Configure the tool's parameters and view the output.
+
+### Flow Palette
+
+The Flow Palette displays available nodes that can be added to your workflow:
+
+1. **Basic Nodes**:
+   - Start Node: The entry point of the workflow.
+   - End Node: The exit point of the workflow.
+
+2. **AI Agents**:
+   - Lists all available AI agents that can be added to the workflow.
+   - Drag an agent to the canvas to add it to your workflow.
+
+3. **Tools**:
+   - Lists all available tools that can be added to the workflow.
+   - Drag a tool to the canvas to add it to your workflow.
+
+### Node Configuration
+
+Each node in the workflow can be configured by clicking the "Configure" button:
+
+1. **Agent Node Configuration**:
+   - Input: Enter the prompt for the AI agent or select parameters from previous nodes.
+   - Output: View or configure the output format.
+
+2. **Tool Node Configuration**:
+   - Parameters: Configure the tool's input parameters.
+   - Output: View or configure the output format.
+
+### Workflow Execution
+
+Execute a workflow to see it in action:
+
+1. **Start Execution**:
+   - Click the "Execute" button on a workflow card to run it.
+   - A modal will open showing the workflow's nodes and execution status.
+
+2. **Execution View**:
+   - See the status of each node (Not Started, Running, Completed, Failed).
+   - View the input and output of each node.
+   - For agent nodes, see the model used and the detailed response.
+
+3. **Control Execution**:
+   - Start: Begin executing the workflow nodes in sequence.
+   - Cancel: Stop the workflow execution at any point.
+
+4. **Parameter Input**:
+   - For the first node, you'll be prompted to enter parameters.
+   - Subsequent nodes will use values from previous nodes.
+
+### Variable Substitution
+
+Workflows support variable substitution to pass data between nodes:
+
+1. **Syntax**:
+   - Use \`{{nodeId.output.response}}\` to reference a node's output.
+   - Use \`{{nodeId.input.userPrompt}}\` to reference a node's input.
+
+2. **Parameter Selection**:
+   - When configuring a node, click "Pick" to select parameters from previous nodes.
+   - A tree view will show available parameters that can be inserted.
+
+### Best Practices
+
+1. **Plan Your Workflow**:
+   - Define the objective of your workflow before creating it.
+   - Identify the agents and tools you'll need.
+
+2. **Use Descriptive Names**:
+   - Give your workflow a clear, descriptive name.
+   - Add a detailed description to explain the workflow's purpose.
+
+3. **Test Incrementally**:
+   - Test each node individually before connecting them.
+   - Execute the workflow at different stages to ensure proper flow.
+
+4. **Use Global Variables**:
+   - Store common values in global variables for reuse across the workflow.
+   - Update global variables as needed to customize workflow behavior.
+    `,
+  },
 };

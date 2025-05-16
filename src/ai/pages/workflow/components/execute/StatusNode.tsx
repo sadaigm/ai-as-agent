@@ -1,6 +1,6 @@
 import { Space } from "antd";
 import React, { FC } from "react";
-import { CheckCircleFilled } from "@ant-design/icons";
+import { CheckCircleFilled, CloseCircleFilled, StopFilled, SyncOutlined } from "@ant-design/icons";
 
 type StatusNodeProps = {
   name: string;
@@ -8,47 +8,25 @@ type StatusNodeProps = {
 };
 
 const StatusNode: FC<StatusNodeProps> = ({ name, status }) => {
+  // Define a mapping for status to style and icon
+  const statusStyles: Record<string, { color: string; icon: React.ReactNode }> = {
+    "Completed": { color: "#009688", icon: <CheckCircleFilled /> },
+    "Not Started": { color: "#03a9f4", icon: <CheckCircleFilled /> },
+    "Running": { color: "#3f51b5", icon: <SyncOutlined spin /> },
+    "Failed": { color: "#f44336", icon: <CloseCircleFilled /> },
+    "Cancelled": { color: "#ff5722", icon: <StopFilled /> },
+  };
+
+  const { color, icon } = statusStyles[status] || { color: "#000000", icon: null };
+
   return (
-    <div
-      style={{ display: "flex", flexDirection: "row", alignItems: "center" }}
-    >
+    <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
       <Space>
         <div style={{ fontWeight: "bold" }}>{name}</div>
-        {status === "Completed" && (
+        {icon && (
           <div>
-            <CheckCircleFilled
-              style={{ color: "#009688", marginRight: "5px" }}
-            />
-
-            <span style={{ color: "#009688", marginRight: "5px" }} >{status}</span>
-          </div>
-        )}
-        {status === "Not Started" && (
-          <div>
-            <CheckCircleFilled
-              style={{ color: "#03a9f4", marginRight: "5px" }}
-            />
-
-            <span  style={{ color: "#03a9f4", marginRight: "5px" }}>{status}</span>
-          </div>
-        )}
-        {status === "Running" && (
-          <div>
-            <CheckCircleFilled
-              style={{ color: "#ffc107", marginRight: "5px" }}
-            />
-
-            <span style={{ color: "#ffc107", marginRight: "5px" }}>{status}</span>
-          </div>
-        )}
-
-        {status === "Failed" && (
-          <div>
-            <CheckCircleFilled
-              style={{ color: "#ff5722", marginRight: "5px" }}
-            />
-
-            <span style={{ color: "#ff5722", marginRight: "5px" }}>{status}</span>
+            {React.cloneElement(icon as React.ReactElement, { style: { color, marginRight: "5px" } })}
+            <span style={{ color, marginRight: "5px" }}>{status}</span>
           </div>
         )}
       </Space>
