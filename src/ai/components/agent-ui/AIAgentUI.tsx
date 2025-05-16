@@ -33,12 +33,19 @@ const AIAgentUI = () => {
           ...prev,
           { role: "assistant", content: responseData },
         ]);
+        if(useConversation){
+          setResponseData(null);
+        }        
       } else if (streamingData) {
         setConversation((prev) => [
           ...prev,
           { role: "assistant", content: streamingData },
         ]);
+        if(useConversation){
+          setStreamingData("");
+        }
       }
+
     }
   }, [loading, responseData, streamingData]);
 
@@ -50,7 +57,7 @@ const AIAgentUI = () => {
     console.log("debug", { chatHistory });
   }, [chatHistory]);
 
-  console.log({ streamingData });
+  // console.log({ streamingData });
 
   return (
     <Row className="ai__agent" gutter={24} style={{ height: "100%" }}>
@@ -88,7 +95,11 @@ const AIAgentUI = () => {
           flexDirection: "column",
         }}
       >
-        <ResponsePanel responseData={responseData} streamingData={streamingData} 
+        <ResponsePanel 
+        useConversation={useConversation}
+        conversation={conversation}
+        setConversation={setConversation}
+        responseData={responseData} streamingData={streamingData} 
         setResponseData={setResponseData} setStreamingData={setStreamingData} />
       </Col>
     </Row>

@@ -4,7 +4,7 @@ import SourceHandle from "../handle/SourceHandle";
 import { CSSProperties } from "styled-components";
 
 const StartNode = (props: any) => {
-  const tool: any = props.data.data;
+  const tool: any = props.data.node;
   const startNodeStyle :CSSProperties = {
     height: "50px",
     width: "50px",

@@ -60,6 +60,14 @@ const AiRoutes = () => {
         }
       />
       <Route
+        path={"/workflow-ai-open/:id"}
+        element={
+          <>
+            <WorkflowAI />
+          </>
+        }
+      />
+      <Route
         path={"/settings-ai"}
         element={
           <>

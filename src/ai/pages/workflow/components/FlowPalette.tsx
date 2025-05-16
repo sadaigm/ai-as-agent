@@ -14,10 +14,10 @@ const FlowPalette = () => {
     // Handle node-specific logic here
   }, []);
   // Handle drag start for nodes
-  const onDragStart = (event: React.DragEvent, nodeType: string, data: any) => {
+  const onDragStart = (event: React.DragEvent, nodeType: string, node: any) => {
     event.dataTransfer.setData(
       "application/reactflow",
-      JSON.stringify({ nodeType, data, callback: nodeCallBack, })
+      JSON.stringify({ nodeType, node: node, callback: nodeCallBack, })
     );
     event.dataTransfer.effectAllowed = "move";
   };

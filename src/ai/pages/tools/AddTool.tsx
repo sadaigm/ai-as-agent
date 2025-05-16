@@ -1,4 +1,4 @@
-import { Modal, Form, Input, List, Checkbox, Button, Select } from "antd";
+import { Modal, Form, Input, Button, Select } from "antd";
 import { FC, useEffect, useState } from "react";
 import { Parameter, Tool } from "./ToolItem";
 import { ChatPayload } from "../../components/types/tool";

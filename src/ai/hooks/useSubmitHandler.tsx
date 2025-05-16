@@ -82,6 +82,10 @@ export const useSubmitHandler = ({
       }
       setLoading(false);
     }
+    finally {
+      setLoading(false);
+      setAbortController(null); // Reset the abort controller
+    }
   };
 
   return handleSubmit;

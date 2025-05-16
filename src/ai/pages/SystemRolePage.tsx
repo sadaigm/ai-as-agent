@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSystemRole } from "../hooks/useSystemRole";
 import SystemRoleList from "./roles/SystemRoleList";
-import { Button, Empty, notification } from "antd";
+import { Button, Empty, Input, notification } from "antd";
 import AddSystemRole from "./roles/AddSystemRole";
 import { SystemRolePrompt } from "../components/types/tool";
 import "./role.css";
 import { UserAddOutlined } from "@ant-design/icons";
+
+const { Search } = Input;
 
 const SystemRolePage = () => {
   const {
@@ -16,6 +18,12 @@ const SystemRolePage = () => {
   } = useSystemRole();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingRole, setEditingRole] = useState<SystemRolePrompt | null>(null);
+  const [filtered, setFiltered] = useState(systemRolePrompts);
+  
+    useEffect(() => {
+      setFiltered(systemRolePrompts);
+    },[systemRolePrompts])
+  
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -43,6 +51,20 @@ const SystemRolePage = () => {
     return <Empty description="No System Roles available" />;
   }
 
+    const onSearch = (value: string) => {
+    console.log(value);
+    if (value === "") {
+      setFiltered(systemRolePrompts);
+      return;
+    }
+    if (value.length > 2) {
+      const filteredAgents = systemRolePrompts.filter((systemRolePrompt) => {
+        return systemRolePrompt.systemRole.toLowerCase().includes(value.toLowerCase());
+      });
+      setFiltered(filteredAgents);
+    }
+  };
+
   return (
     <div
       style={{
@@ -50,9 +72,10 @@ const SystemRolePage = () => {
         width: "100%",
       }}
     >
-      <div style={{ height: "50px" }}>
+      <div style={{ height: "50px",  display: "flex", padding: "10px", justifyContent: "space-between" }}>
         {" "}
-        <Button
+       <div>
+         <Button
           // type="primary"
           onClick={showModal}
           style={{ marginBottom: "16px" }}
@@ -60,6 +83,19 @@ const SystemRolePage = () => {
         >
           Add Role
         </Button>
+       </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexDirection:"row" }}>
+          <div  style={{ width: "70px"}}>
+            <span > Total: {filtered.length}</span>
+          </div>
+          <Search
+          placeholder="input search text"
+          allowClear
+          enterButton="Search"
+          size="middle"
+          onSearch={onSearch}
+        />
+        </div>
       </div>
       <div
         className="system__roles"
@@ -71,7 +107,7 @@ const SystemRolePage = () => {
         }}
       >
         <SystemRoleList
-          systemRolePrompts={systemRolePrompts}
+          systemRolePrompts={filtered}
           onEdit={handleEdit}
           onDelete={handleDelete}
         />

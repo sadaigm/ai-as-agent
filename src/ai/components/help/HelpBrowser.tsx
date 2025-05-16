@@ -6,6 +6,9 @@ import {
   SettingOutlined,
   ThunderboltOutlined,
   AntDesignOutlined,
+  ToolOutlined,
+  RobotOutlined,
+  PartitionOutlined,
 } from "@ant-design/icons";
 import { useLocation } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
@@ -38,28 +41,33 @@ const HelpBrowser: React.FC<HelpBrowserProps> = () => {
         items={[
           {
             key: "playground-ai",
-            icon: <AntDesignOutlined />,
+            icon: <AntDesignOutlined style={{ color: "#1890ff" }} />,
             label: "AI Playground",
           },
           {
             key: "roles",
-            icon: <UserOutlined />,
+            icon: <UserOutlined style={{ color: "#52c41a" }} />,
             label: "AI Roles",
           },
           {
             key: "tools",
-            icon: <SettingOutlined />,
+            icon: <ToolOutlined style={{ color: "#722ed1" }} />,
             label: "AI Tools",
           },
           {
             key: "agents",
-            icon: <ThunderboltOutlined />,
+            icon: <RobotOutlined style={{ color: "#fa8c16" }} />,
             label: "AI Agents",
           },
           {
             key: "settings-ai",
-            icon: <SettingOutlined />,
+            icon: <SettingOutlined style={{ color: "#f5222d" }} />,
             label: "Settings",
+          },
+          {
+            key: "workflow-ai",
+            icon: <PartitionOutlined style={{ color: "#13c2c2" }} />,
+            label: "Workflow AI",
           },
         ]}
       />

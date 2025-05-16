@@ -101,6 +101,7 @@ export const getDefaultAI = (): Environment | undefined => {
 
 // Save a workflow
 export const saveWorkflow = (workflow: Workflow) => {
+  console.log({workflow})
   const data = localStorage.getItem(WORKFLOWS_KEY);
   const workflows = data ? (JSON.parse(data) as Workflow[]) : [];
   // Check if the workflow already exists
