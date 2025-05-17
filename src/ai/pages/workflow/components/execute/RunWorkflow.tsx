@@ -361,6 +361,23 @@ const RunWorkflow: React.FC<RunWorkflowProps> = ({
     }
   };
 
+  const getNodeId = (node: WorkflowNode) => {
+    return [
+      {
+        title: `Node Id`,
+        key: `${node.id}.id`,
+        value: node.id,
+        children:[
+          {
+            title: `${node.id}`,
+            key: `${node.id}.value`,
+            value: node.id,
+          },
+        ]
+      },
+    ];
+  };
+
   console.log({ workflow });
   const treeData = getExecutionOrder()
     .filter((node) => node.type !== "startNode" && node.type !== "endNode")
@@ -381,6 +398,9 @@ const RunWorkflow: React.FC<RunWorkflowProps> = ({
       key: node.id,
 
       children: [
+        // get the node id as a child node
+        ...getNodeId(node),
+
         // Add the model name as a child node
         ...(node.type === "agentNode"
           ? [
