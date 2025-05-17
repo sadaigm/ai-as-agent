@@ -29,6 +29,6 @@ export type Workflow  = {
     name: string;
     description: string;   
     mappings: any[]
-    globalVariables: any;
+    globalVariables: Record<string, any>;
     input: any;
 }

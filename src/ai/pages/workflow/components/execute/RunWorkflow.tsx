@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Tree, Button, Modal, Input, message } from "antd";
+import { Tree, Button, Modal, message } from "antd";
 import { PartitionOutlined, ThunderboltOutlined } from "@ant-design/icons";
 import { Workflow, WorkflowNode } from "../../workflow.types";
 import { useSubmitHandler } from "../../../../hooks/useSubmitHandler";
@@ -8,11 +8,12 @@ import {
   AIAgent,
   ChatPayload,
   ParameterV1,
-  Tool,
 } from "../../../../components/types/tool";
 import StatusNode from "./StatusNode";
 import WorkflowResponse from "./WorkflowResponse";
 import "./workflow.css";
+import { getExecutionOrder, getNodeName } from "./ExecutorUtils";
+import RuntimeParameters from "./RuntimeParameters";
 
 type RunWorkflowProps = {
   workflow: Workflow;
@@ -31,6 +32,9 @@ const RunWorkflow: React.FC<RunWorkflowProps> = ({
       return acc;
     }, {} as Record<string, string>)
   );
+  const [globalVariableParams, setGlobalVariableParams] = useState<
+    Record<string, any>
+  >(workflow.globalVariables || {});
   const [currentNode, setCurrentNode] = useState<WorkflowNode | null>(null);
   const [executionOrder, setExecutionOrder] = useState<WorkflowNode[]>([]);
   const [nodeIndex, setNodeIndex] = useState(0);
@@ -62,32 +66,6 @@ const RunWorkflow: React.FC<RunWorkflowProps> = ({
     setStreamingData,
     setAbortController,
   });
-
-  const getExecutionOrder = () => {
-    const startNode = workflow.nodes.find((node) => node.type === "startNode");
-    if (!startNode) {
-      message.error("No start node found in the workflow.");
-      return [];
-    }
-
-    const order: WorkflowNode[] = [];
-    let current = startNode;
-
-    while (current) {
-      order.push(current);
-      const nextEdge = workflow.edges.find(
-        (edge) => edge.source === current.id
-      );
-      if (!nextEdge) break;
-      const nextNode = workflow.nodes.find(
-        (node) => node.id === nextEdge.target
-      );
-      if (!nextNode) break;
-      current = nextNode;
-    }
-
-    return order;
-  };
 
   useEffect(() => {
     if (currentNode && (responseData || streamingData)) {
@@ -150,7 +128,7 @@ const RunWorkflow: React.FC<RunWorkflowProps> = ({
   }, [nodeIndex, executionOrder]);
 
   const handleStartWorkflow = () => {
-    const executionOrder = getExecutionOrder().filter(
+    const executionOrder = getExecutionOrder(workflow).filter(
       (node) => node.type !== "startNode" && node.type !== "endNode"
     );
     if (executionOrder.length === 0) return;
@@ -339,6 +317,7 @@ const RunWorkflow: React.FC<RunWorkflowProps> = ({
                   status={nodeStatuses[node.id]}
                 />
               ),
+               className: "ai_workflow__output-response",
               key: `${node.id}.output.response`,
               value: params?.output?.response || "",
             },
@@ -367,19 +346,19 @@ const RunWorkflow: React.FC<RunWorkflowProps> = ({
         title: `Node Id`,
         key: `${node.id}.id`,
         value: node.id,
-        children:[
+        children: [
           {
             title: `${node.id}`,
             key: `${node.id}.value`,
             value: node.id,
           },
-        ]
+        ],
       },
     ];
   };
 
   console.log({ workflow });
-  const treeData = getExecutionOrder()
+  const treeData = getExecutionOrder(workflow)
     .filter((node) => node.type !== "startNode" && node.type !== "endNode")
     .filter(
       (node) =>
@@ -429,28 +408,6 @@ const RunWorkflow: React.FC<RunWorkflowProps> = ({
       ],
     }));
 
-  function getNodeName(currentNode: WorkflowNode | null) {
-    console.log({ currentNode });
-    if (!currentNode) return "unKnown";
-    if (currentNode.type === "agentNode") {
-      return (currentNode.data.node as AIAgent).name;
-    } else if (currentNode.type === "toolNode") {
-      return (currentNode.data.node as Tool).function.name;
-    }
-  }
-
-  const getNodeInput = () => {
-    if (!currentNode) return "";
-    if (currentNode.type === "agentNode") {
-      const agentParam =
-        nodeParams[currentNode?.id || ""]?.input?.userPrompt || "";
-      return agentParam;
-    } else if (currentNode.type === "toolNode") {
-      const toolParam = nodeParams[currentNode?.id || ""]?.input || {};
-      return JSON.stringify(toolParam || {}, null, 2);
-    }
-    return "";
-  };
   const handleCancel = () => {
     if (abortController) {
       try {
@@ -486,6 +443,7 @@ const RunWorkflow: React.FC<RunWorkflowProps> = ({
       </div>
     </>
   );
+
   return (
     <Modal
       className="ai_workflow__run-modal fullmodel"
@@ -513,30 +471,19 @@ const RunWorkflow: React.FC<RunWorkflowProps> = ({
       <div>
         <Tree treeData={treeData} defaultExpandAll />
 
-        <Modal
-          title={`Enter Parameters for ${getNodeName(currentNode)}`}
-          visible={isParamModalVisible}
-          onCancel={() => {
-            handleCancel();
-            setIsParamModalVisible(false);
-          }}
-          onOk={() => handleSubmitParams()}
-        >
-          <Input.TextArea
-            rows={4}
-            placeholder="Enter parameters as JSON"
-            value={getNodeInput()}
-            onChange={(e) =>
-              setNodeParams((prev) => ({
-                ...prev,
-                [currentNode?.id || ""]: {
-                  ...prev[currentNode?.id || ""],
-                  input: { userPrompt: e.target.value },
-                },
-              }))
-            }
+        {isParamModalVisible && (
+          <RuntimeParameters
+            globalVariableParams={globalVariableParams}
+            setGlobalVariableParams={setGlobalVariableParams}
+            executionNodes={getExecutionOrder(workflow)}
+            nodeParams={nodeParams}
+            setNodeParams={setNodeParams}
+            isParamModalVisible={isParamModalVisible}
+            setIsParamModalVisible={setIsParamModalVisible}
+            handleCancel={handleCancel}
+            handleSubmitParams={handleSubmitParams}
           />
-        </Modal>
+        )}
       </div>
     </Modal>
   );
