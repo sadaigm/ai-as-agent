@@ -158,11 +158,11 @@ jobs:
             root /usr/share/nginx/html;
             index index.html;
             
-            # Security headers
+            # Security headers with updated CSP to allow connections to external APIs
             add_header X-Content-Type-Options "nosniff";
             add_header X-Frame-Options "SAMEORIGIN";
             add_header X-XSS-Protection "1; mode=block";
-            add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'";
+            add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' http://127.0.0.1:11434 http://localhost:11434 https://* http://*";
             
             location / {
                 try_files $uri $uri/ /index.html;
