@@ -1,0 +1,7 @@
+version: '3'
+services:
+  app:
+    image: ai-agent-ui
+    ports:
+      - "8080:80"
+    restart: unless-stopped

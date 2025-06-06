@@ -1,0 +1,156 @@
+name: Build and Package Release
+
+on:
+  push: # This will trigger on any branch push
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version'
+        required: true
+        default: '1.0.0'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Get short commit ID
+      id: get_commit
+      run: echo "SHORT_COMMIT=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+    
+    - name: Determine filename prefix
+      id: filename
+      run: |
+        BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})
+        if [[ "$BRANCH_NAME" == "master" || "$BRANCH_NAME" == "main" || "$BRANCH_NAME" == "release" ]]; then
+          echo "PREFIX=release" >> $GITHUB_OUTPUT
+        else
+          echo "PREFIX=dev" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build React app
+      run: npm run build
+      
+    - name: Copy deployment scripts to dist
+      run: |
+        cp build-image.sh dist/
+        cp runs-image.sh dist/
+        chmod +x dist/build-image.sh dist/runs-image.sh
+        
+        # Create Windows batch versions
+        echo "@echo off" > dist/build-image.bat
+        echo "docker build -t ai-agent-ui ." >> dist/build-image.bat
+        
+        echo "@echo off" > dist/runs-image.bat
+        echo "docker stop ai-agent-ui 2>nul" >> dist/runs-image.bat
+        echo "docker rm ai-agent-ui 2>nul" >> dist/runs-image.bat
+        echo "docker run -d -p 8080:80 --name ai-agent-ui ai-agent-ui" >> dist/runs-image.bat
+        echo "echo The application is now running at http://localhost:8080" >> dist/runs-image.bat
+    
+    - name: Create Dockerfile in dist
+      run: |
+        cat > dist/Dockerfile << 'EOF'
+        FROM nginx:alpine
+        COPY . /usr/share/nginx/html
+        COPY nginx.conf /etc/nginx/conf.d/default.conf
+        EXPOSE 80
+        CMD ["nginx", "-g", "daemon off;"]
+        EOF
+        
+        # Create nginx.conf
+        cat > dist/nginx.conf << 'EOF'
+        server {
+            listen 80;
+            server_name localhost;
+            root /usr/share/nginx/html;
+            index index.html;
+            
+            location / {
+                try_files $uri $uri/ /index.html;
+            }
+            
+            location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
+                expires 30d;
+                add_header Cache-Control "public, no-transform";
+            }
+        }
+        EOF
+        
+    - name: Create README for deployment
+      run: |
+        cat > dist/README.md << 'EOF'
+        # AI Agent UI - Deployment Package
+        
+        This package contains the built AI Agent UI application and scripts to deploy it using Docker.
+        
+        ## Quick Start
+        
+        ### Linux/macOS:
+        
+        ```bash
+        # Build the Docker image
+        ./build-image.sh
+        
+        # Run the Docker container
+        ./runs-image.sh
+        ```
+        
+        ### Windows:
+        
+        ```
+        # Build the Docker image
+        build-image.bat
+        
+        # Run the Docker container
+        runs-image.bat
+        ```
+        
+        The application will be available at http://localhost:8080
+        
+        ## Requirements
+        
+        - Docker must be installed on your system
+        
+        ## Contents
+        
+        - Static web files (HTML, CSS, JS)
+        - Dockerfile
+        - nginx.conf
+        - Deployment scripts for Linux/macOS and Windows
+        EOF
+    
+    - name: Create zip file with commit ID
+      run: |
+        cd dist
+        ZIP_FILENAME="${{ steps.filename.outputs.PREFIX }}_${{ steps.get_commit.outputs.SHORT_COMMIT }}.zip"
+        zip -r "../$ZIP_FILENAME" *
+        echo "ZIP_FILENAME=$ZIP_FILENAME" >> $GITHUB_ENV
+    
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ env.ZIP_FILENAME }}
+        path: ${{ env.ZIP_FILENAME }}
+        
+    - name: Create GitHub Release
+      if: github.event_name == 'workflow_dispatch'
+      uses: softprops/action-gh-release@v1
+      with:
+        files: ${{ env.ZIP_FILENAME }}
+        tag_name: v${{ github.event.inputs.version }}
+        name: Release v${{ github.event.inputs.version }}
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
