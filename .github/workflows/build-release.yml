@@ -158,7 +158,8 @@ jobs:
         name: ${{ env.ZIP_FILENAME }}
         path: ${{ env.ZIP_FILENAME }}
         
-    - name: Create GitHub Release
+    # Manual Release (via workflow_dispatch)
+    - name: Create versioned GitHub Release
       if: github.event_name == 'workflow_dispatch'
       uses: softprops/action-gh-release@v1
       with:
@@ -167,5 +168,36 @@ jobs:
         name: Release v${{ github.event.inputs.version }}
         draft: false
         prerelease: false
+        body: |
+          ## AI Agent UI Release v${{ github.event.inputs.version }}
+          
+          This release contains the built application with Docker deployment scripts.
+          
+          ### Installation
+          1. Download the zip file
+          2. Extract the contents
+          3. Run `./build-image.sh` (or `build-image.bat` on Windows)
+          4. Run `./runs-image.sh` (or `runs-image.bat` on Windows)
+          
+          The application will be available at http://localhost:8080
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    # Automatic Release (for all pushes)
+    - name: Create automatic GitHub Release
+      if: github.event_name == 'push'
+      uses: softprops/action-gh-release@v1
+      with:
+        files: ${{ env.ZIP_FILENAME }}
+        tag_name: ${{ steps.filename.outputs.PREFIX }}-${{ steps.get_commit.outputs.SHORT_COMMIT }}
+        name: ${{ steps.filename.outputs.PREFIX }} build ${{ steps.get_commit.outputs.SHORT_COMMIT }}
+        draft: false
+        prerelease: ${{ steps.filename.outputs.PREFIX == 'dev' }}
+        body: |
+          ## Automated ${{ steps.filename.outputs.PREFIX }} build
+          
+          Branch: ${{ github.ref_name }}
+          Commit: ${{ github.sha }}
+          Build date: ${{ github.event.head_commit.timestamp }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
