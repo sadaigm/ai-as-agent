@@ -42,25 +42,38 @@ jobs:
     - name: Build React app
       run: npm run build
       
-    - name: Copy deployment scripts to dist
+    - name: Find build directory
+      id: build-dir
       run: |
-        cp build-image.sh dist/
-        cp runs-image.sh dist/
-        chmod +x dist/build-image.sh dist/runs-image.sh
+        if [ -d "dist" ]; then
+          echo "BUILD_DIR=dist" >> $GITHUB_OUTPUT
+        elif [ -d "build" ]; then
+          echo "BUILD_DIR=build" >> $GITHUB_OUTPUT
+        else
+          echo "No build directory found. Creating dist directory."
+          mkdir -p dist
+          echo "BUILD_DIR=dist" >> $GITHUB_OUTPUT
+        fi
+      
+    - name: Copy deployment scripts to build directory
+      run: |
+        cp build-image.sh ${{ steps.build-dir.outputs.BUILD_DIR }}/
+        cp runs-image.sh ${{ steps.build-dir.outputs.BUILD_DIR }}/
+        chmod +x ${{ steps.build-dir.outputs.BUILD_DIR }}/build-image.sh ${{ steps.build-dir.outputs.BUILD_DIR }}/runs-image.sh
         
         # Create Windows batch versions
-        echo "@echo off" > dist/build-image.bat
-        echo "docker build -t ai-agent-ui ." >> dist/build-image.bat
+        echo "@echo off" > ${{ steps.build-dir.outputs.BUILD_DIR }}/build-image.bat
+        echo "docker build -t ai-agent-ui ." >> ${{ steps.build-dir.outputs.BUILD_DIR }}/build-image.bat
         
-        echo "@echo off" > dist/runs-image.bat
-        echo "docker stop ai-agent-ui 2>nul" >> dist/runs-image.bat
-        echo "docker rm ai-agent-ui 2>nul" >> dist/runs-image.bat
-        echo "docker run -d -p 8080:80 --name ai-agent-ui ai-agent-ui" >> dist/runs-image.bat
-        echo "echo The application is now running at http://localhost:8080" >> dist/runs-image.bat
+        echo "@echo off" > ${{ steps.build-dir.outputs.BUILD_DIR }}/runs-image.bat
+        echo "docker stop ai-agent-ui 2>nul" >> ${{ steps.build-dir.outputs.BUILD_DIR }}/runs-image.bat
+        echo "docker rm ai-agent-ui 2>nul" >> ${{ steps.build-dir.outputs.BUILD_DIR }}/runs-image.bat
+        echo "docker run -d -p 8080:80 --name ai-agent-ui ai-agent-ui" >> ${{ steps.build-dir.outputs.BUILD_DIR }}/runs-image.bat
+        echo "echo The application is now running at http://localhost:8080" >> ${{ steps.build-dir.outputs.BUILD_DIR }}/runs-image.bat
     
-    - name: Create Dockerfile in dist
+    - name: Create Dockerfile in build directory
       run: |
-        cat > dist/Dockerfile << 'EOF'
+        cat > ${{ steps.build-dir.outputs.BUILD_DIR }}/Dockerfile << 'EOF'
         FROM nginx:alpine
         COPY . /usr/share/nginx/html
         COPY nginx.conf /etc/nginx/conf.d/default.conf
@@ -69,7 +82,7 @@ jobs:
         EOF
         
         # Create nginx.conf
-        cat > dist/nginx.conf << 'EOF'
+        cat > ${{ steps.build-dir.outputs.BUILD_DIR }}/nginx.conf << 'EOF'
         server {
             listen 80;
             server_name localhost;
@@ -89,7 +102,7 @@ jobs:
         
     - name: Create README for deployment
       run: |
-        cat > dist/README.md << 'EOF'
+        cat > ${{ steps.build-dir.outputs.BUILD_DIR }}/README.md << 'EOF'
         # AI Agent UI - Deployment Package
         
         This package contains the built AI Agent UI application and scripts to deploy it using Docker.
@@ -132,13 +145,14 @@ jobs:
     
     - name: Create zip file with commit ID
       run: |
-        cd dist
+        cd ${{ steps.build-dir.outputs.BUILD_DIR }}
         ZIP_FILENAME="${{ steps.filename.outputs.PREFIX }}_${{ steps.get_commit.outputs.SHORT_COMMIT }}.zip"
-        zip -r "../$ZIP_FILENAME" *
+        zip -r "../../$ZIP_FILENAME" *
+        cd ../
         echo "ZIP_FILENAME=$ZIP_FILENAME" >> $GITHUB_ENV
     
     - name: Upload artifact
-      uses: actions/upload-artifact@v4  # Updated from v3 to v4
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ env.ZIP_FILENAME }}
         path: ${{ env.ZIP_FILENAME }}
