@@ -57,10 +57,27 @@ jobs:
     - name: Install dependencies
       run: npm ci --no-audit --no-fund
     
-    # Add security scanning
+    - name: Fix security vulnerabilities
+      run: npm audit fix --force
+      continue-on-error: true  # Don't fail if fixes can't be applied
+    
+    # Update the security audit step to be more detailed
     - name: Run security audit
-      run: npm audit --production
-      continue-on-error: true  # Don't fail the build but report issues
+      run: |
+        echo "Running npm audit with detailed output"
+        npm audit --production --json > audit_results.json || true
+        echo "Security audit completed. Checking for high severity issues only..."
+        
+        # Only fail on high or critical severity issues
+        high_critical_count=$(cat audit_results.json | grep -c '"severity":"high\|critical"' || echo "0")
+        if [ "$high_critical_count" -gt "0" ]; then
+          echo "::error::Found $high_critical_count high or critical severity vulnerabilities"
+          echo "Vulnerable packages:"
+          cat audit_results.json | grep -A 5 '"severity":"high\|critical"'
+          exit 1
+        else
+          echo "No high or critical vulnerabilities found"
+        fi
     
     - name: Build React app
       run: npm run build
