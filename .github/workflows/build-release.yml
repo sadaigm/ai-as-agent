@@ -271,7 +271,7 @@ jobs:
         (github.ref == 'refs/heads/main' || 
          github.ref == 'refs/heads/master' || 
          github.ref == 'refs/heads/release' || 
-         (github.ref == 'refs/heads/dev' && github.event.head_commit.message contains '[release]'))
+         (github.ref == 'refs/heads/dev' && contains(github.event.head_commit.message, '[release]')))
       uses: softprops/action-gh-release@v1
       with:
         files: ${{ env.ZIP_FILENAME }}
