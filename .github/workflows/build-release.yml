@@ -145,10 +145,11 @@ jobs:
     
     - name: Create zip file with commit ID
       run: |
-        cd ${{ steps.build-dir.outputs.BUILD_DIR }}
         ZIP_FILENAME="${{ steps.filename.outputs.PREFIX }}_${{ steps.get_commit.outputs.SHORT_COMMIT }}.zip"
-        zip -r "../../$ZIP_FILENAME" *
-        cd ../
+        cd ${{ steps.build-dir.outputs.BUILD_DIR }}
+        zip -r "../$ZIP_FILENAME" *
+        cd ..
+        ls -la  # Debug: List files in the directory
         echo "ZIP_FILENAME=$ZIP_FILENAME" >> $GITHUB_ENV
     
     - name: Upload artifact
