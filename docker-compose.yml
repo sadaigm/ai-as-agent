@@ -2,6 +2,18 @@ version: '3'
 services:
   app:
     image: ai-agent-ui
+    container_name: ai-agent-ui
     ports:
-      - "8080:80"
+      - "5000:80"
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    networks:
+      - ai-agent-network
+
+networks:
+  ai-agent-network:
+    driver: bridge
