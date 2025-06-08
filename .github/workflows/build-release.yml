@@ -150,7 +150,7 @@ jobs:
         CMD ["nginx", "-g", "daemon off;"]
         EOF
         
-        # Create nginx.conf with security headers
+        # Create nginx.conf with security headers and proper SPA routing
         cat > ${{ steps.build-dir.outputs.BUILD_DIR }}/nginx.conf << 'EOF'
         server {
             listen 80;
@@ -164,18 +164,21 @@ jobs:
             add_header X-XSS-Protection "1; mode=block";
             add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' http://127.0.0.1:11434 http://localhost:11434 https://* http://*";
             
-            location / {
-                try_files $uri $uri/ /index.html;
-            }
-            
+            # Serve static files directly
             location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
                 expires 30d;
                 add_header Cache-Control "public, no-transform";
+                try_files $uri =404;
             }
             
             # Deny access to .git directories and sensitive files
             location ~ /\.(?!well-known).* {
                 deny all;
+            }
+            
+            # This is the key change - all non-file routes go to index.html
+            location / {
+                try_files $uri $uri/ /index.html;
             }
         }
         EOF
