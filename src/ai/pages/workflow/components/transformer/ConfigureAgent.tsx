@@ -43,7 +43,7 @@ const ConfigureAgent: FC<AgentParameterProps> = ({
             nodeParams={nodeParams}
             onUpdateNodeData={handleUpdateNodeData}
             treeData={treeData}
-            fieldKey={"input"}
+            fieldKey={"userPrompt"}
           />
         </div>
       </div>
