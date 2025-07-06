@@ -33,7 +33,8 @@ const WorkflowAIList: React.FC = () => {
   };
 
   const handleExecute = (workflow: Workflow) => {
-    setSelectedWorkflow(workflow);
+    const clonedWorkflow = JSON.parse(JSON.stringify(workflow));
+    setSelectedWorkflow(clonedWorkflow);
     setIsRunModalVisible(true); // Open the run workflow modal
   };
 

@@ -52,7 +52,7 @@ const ExpressionField: FC<ExpressionFieldProps> = ({
     setSelectedKeys([]); // Reset the selected keys
   };
   return (
-    <div style={{ display: "flex", alignItems: "center" }}>
+    <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
       <TextArea
         ref={textAreaRef}
         rows={4}
