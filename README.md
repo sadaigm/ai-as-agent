@@ -4,7 +4,7 @@ AI Agent UI is a lightweight, user-friendly platform that enables users to confi
 
 The platform also allows users to extend the functionality of their AI agents by adding external tools, such as fetching weather data, making it a versatile solution for a wide range of use cases. With its split-layout design, **AI Agent UI** ensures a seamless user experience for both configuring agents and displaying real-time responses.
 
-**AI Agent UI** goes beyond basic interactions, with plans to include advanced features like customizable **AI Roles** to define specialized agent behaviors (e.g., Assistant, Researcher) and a dedicated **AI Tools Page** to manage integrated tools. These features are in active development to further enhance the platform’s capabilities.
+**AI Agent UI** goes beyond basic interactions, with plans to include advanced features like customizable **AI Roles** to define specialized agent behaviors (e.g., Assistant, Researcher) and a dedicated **AI Tools Page** to manage integrated tools. These features are in active development to further enhance the platform's capabilities.
 
 Designed with flexibility in mind, **AI Agent UI** is the ideal tool for users looking to build, test, and manage diverse AI agents, all while leveraging powerful open-source AI models and tools.
 
@@ -46,6 +46,46 @@ A new **AI Tools** page will allow users to manage a list of tools available for
 As an example, a tool for getting the current weather has been implemented. This is just one of the many tools that can be added in the future.
 
 - **Current Weather Tool**: Fetches weather information based on user input and returns it to the AI agent.
+
+## AI Workflows
+
+The AI Workflows feature allows users to create, manage, and execute complex AI pipelines by connecting AI agents and tools in a visual flow. This enables the creation of sophisticated multi-step AI processes that can be saved and reused.
+
+### Workflow List Page
+
+The Workflow List page displays all saved workflows and provides options to create, edit, execute, or delete workflows.
+
+- **View Workflows**: See all available workflows in a card-based layout.
+- **Search Workflows**: Find specific workflows by name.
+- **Create, Edit, Delete, and Execute Workflows**: Manage your workflows with ease.
+
+### Workflow Editor
+
+The Workflow Editor provides a canvas where users can visually design workflows by adding nodes and connecting them.
+
+- **Workflow Details**: Set workflow name, description, and global variables.
+- **Visual Canvas**: Drag and drop nodes and create connections between them.
+- **Node Configuration**: Configure each node's inputs and outputs.
+
+### Node Types
+
+- **Start Node**: The entry point of every workflow.
+- **End Node**: Marks the completion of a workflow branch.
+- **Agent Node**: Represents an AI agent that processes prompts and generates responses.
+- **Tool Node**: Represents a tool that performs specific actions or fetches data.
+
+### Variable Substitution
+
+Workflows support variable substitution to pass data between nodes:
+
+- Use `{{nodeId.output.response}}` to reference a node's output.
+- Use `{{nodeId.input.userPrompt}}` to reference a node's input.
+
+### Workflow Execution
+
+- **Execution View**: See the status of each node (Not Started, Running, Completed, Failed).
+- **Control Execution**: Start or cancel workflow execution.
+- **Parameter Input**: Input parameters for workflow nodes.
 
 ## Screenshots
 
@@ -99,6 +139,14 @@ As an example, a tool for getting the current weather has been implemented. This
 
     This feature simplifies the process of integrating external APIs, making it easier for users to enhance the functionality of their AI agents with minimal effort.
 
+- **AI Workflows**: A visual workflow editor that allows users to create complex AI pipelines by connecting agents and tools in a flowchart-like interface.
+
+  - **Workflow Canvas**: Drag and drop interface for creating workflows.
+  - **Node Configuration**: Configure inputs and outputs for each node in the workflow.
+  - **Workflow Execution**: Execute workflows and view the results in real-time.
+  - **Variable Substitution**: Pass data between nodes using variable references.
+  - **Global Variables**: Define variables that can be used across the entire workflow.
+
     ## Multi Agent Management
 
 - **Multiple Agents Management**: Users can create multiple agents and view the list of available agents in the Agent list view. Users can view, add, edit, and delete agents.
@@ -117,6 +165,7 @@ As an example, a tool for getting the current weather has been implemented. This
 2. **Efficiency**: Specialized roles allow AI agents to perform tasks more efficiently by focusing on specific functions and contexts.
 3. **Scalability**: Managing multiple agents with distinct roles enables users to scale their AI operations, handling various tasks simultaneously.
 4. **Enhanced Capabilities**: Integrating tools with AI agents extends their functionality, allowing them to perform complex tasks like fetching data from APIs or executing specific functions.
+5. **Process Automation**: Workflows enable users to automate complex processes by chaining together multiple agents and tools in a predefined sequence.
 
 #### Critical Usage
 
@@ -124,13 +173,14 @@ As an example, a tool for getting the current weather has been implemented. This
 2. **Customer Support**: An AI agent with an "Assistant" role can handle customer queries, provide information, and perform actions like booking appointments.
 3. **Data Integration**: Using tools like REST API integration, AI agents can fetch real-time data (e.g., weather information) and use it to provide accurate responses.
 4. **Automation**: AI agents can automate repetitive tasks, such as data entry or report generation, improving productivity and reducing human error.
+5. **Multi-Step Processing**: Workflows can be used to create complex processing pipelines where the output of one agent becomes the input for another.
 - **Agent Persona**: 
   ![Role Based Configuration 1](./screenshots/role_based_1.png)
   ![Role Based Configuration 2](./screenshots/role_based_2.png)
   ![Role Based Configuration 3](./screenshots/role_based_3.png)
   ![List of Agent Roles](./screenshots/Agent%20Role.png)
 
-By leveraging different roles and tool support, users can create versatile and powerful AI agents tailored to their specific requirements.
+By leveraging different roles, tool support, and workflows, users can create versatile and powerful AI systems tailored to their specific requirements.
 
 ## Installation
 
