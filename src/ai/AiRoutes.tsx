@@ -7,6 +7,7 @@ import HelpBrowser from "./components/help/HelpBrowser";
 import Settings from "./pages/settings/Settings";
 import WorkflowAI from "./pages/workflow/WorkflowAI";
 import WorkflowAIList from "./pages/workflow/WorkflowAIList";
+import VoiceAgent from "./components/voice-agent/VoiceAgent";
 
 const AiRoutes = () => {
   return (
@@ -72,6 +73,14 @@ const AiRoutes = () => {
         element={
           <>
             <Settings />
+          </>
+        }
+      />
+      <Route
+        path={"/speech-to-text"}
+        element={
+          <>
+            <VoiceAgent />
           </>
         }
       />

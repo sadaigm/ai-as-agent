@@ -186,6 +186,11 @@ const Ai = () => {
                     icon: <PartitionOutlined />,
                     label: "Workflow AI",
                   },
+                  {
+                    key: "speech-to-text",
+                    icon: <PartitionOutlined />,
+                    label: "Speech to Text",
+                  },
                   ...dynamicMenus
                 ]}
               />

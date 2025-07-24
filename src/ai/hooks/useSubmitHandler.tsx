@@ -6,10 +6,11 @@ import { handleNonStreamResponse } from "../utils/response-utils";
 interface SubmitHandlerParams {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setResponseData: React.Dispatch<React.SetStateAction<any>>;
-  setStreamingData: React.Dispatch<React.SetStateAction<string|null>>;
+  setStreamingData: React.Dispatch<React.SetStateAction<string | null>>;
   setAbortController: React.Dispatch<
     React.SetStateAction<AbortController | null>
   >;
+  chuckStreamData?: boolean;
 }
 
 export const useSubmitHandler = ({
@@ -17,6 +18,7 @@ export const useSubmitHandler = ({
   setResponseData,
   setStreamingData,
   setAbortController,
+  chuckStreamData,
 }: SubmitHandlerParams) => {
   const chatService: ChatService = createChatService();
   const handleSubmit = async (payload: ChatPayload) => {
@@ -40,39 +42,60 @@ export const useSubmitHandler = ({
 
     const isStream = payload.stream && !payload.tools;
     try {
-      const response = await chatService.invoke({...payload,stream: isStream}, controller);
+      const response = await chatService.invoke(
+        { ...payload, stream: isStream },
+        controller
+      );
 
       if (!response.ok) {
         throw new Error("Failed to send request");
       }
 
       if (payload.stream && !payload.tools) {
-        handleStreamResponse(response, controller, setStreamingData,setLoading);
-      }
-      else if(payload.tools && payload.tools.length > 0){
-        handleNonStreamResponse(response, payload, payload.stream, controller).then((data) => {
+        handleStreamResponse(
+          response,
+          controller,
+          setStreamingData,
+          setLoading,
+          chuckStreamData
+        );
+      } else if (payload.tools && payload.tools.length > 0) {
+        handleNonStreamResponse(
+          response,
+          payload,
+          payload.stream,
+          controller
+        ).then((data) => {
           if (data instanceof Response) {
-            if(payload.stream ){
-              handleStreamResponse(data, controller, setStreamingData,setLoading);
-            }
-            else{
-              handleNonStreamResponse(data, payload, false, controller).then((data) => {
-                if (data) {
-                  setResponseData(data);
-                  setLoading(false);
+            if (payload.stream) {
+              handleStreamResponse(
+                data,
+                controller,
+                setStreamingData,
+                setLoading,
+                chuckStreamData
+              );
+            } else {
+              handleNonStreamResponse(data, payload, false, controller).then(
+                (data) => {
+                  if (data) {
+                    setResponseData(data);
+                    setLoading(false);
+                  }
                 }
-              });
+              );
             }
           }
         });
-      }
-      else {
-        handleNonStreamResponse(response, payload, false, controller).then((data) => {
-          if (data) {
-            setResponseData(data);
-            setLoading(false);
+      } else {
+        handleNonStreamResponse(response, payload, false, controller).then(
+          (data) => {
+            if (data) {
+              setResponseData(data);
+              setLoading(false);
+            }
           }
-        });
+        );
       }
     } catch (error: any) {
       if (error.name === "AbortError") {
@@ -81,14 +104,19 @@ export const useSubmitHandler = ({
         message.error(`Error: ${error.message}`);
       }
       setLoading(false);
-    }
-    finally {
+    } finally {
     }
   };
 
   return handleSubmit;
 };
-async function handleStreamResponse(response: Response, controller: AbortController, setStreamingData: React.Dispatch<React.SetStateAction<string|null>>,setLoading: React.Dispatch<React.SetStateAction<boolean>>) {
+async function handleStreamResponse(
+  response: Response,
+  controller: AbortController,
+  setStreamingData: React.Dispatch<React.SetStateAction<string | null>>,
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>,
+  chuckStreamData?: boolean
+) {
   const reader = response.body?.getReader();
   const decoder = new TextDecoder();
   let done = false;
@@ -112,11 +140,17 @@ async function handleStreamResponse(response: Response, controller: AbortControl
         try {
           const formattedJSON = JSON.parse(chunk);
 
-          if (formattedJSON?.choices &&
-            formattedJSON.choices[0]?.delta?.content) {
-            setStreamingData(
-              (prevData) => prevData + formattedJSON.choices[0].delta.content
-            );
+          if (
+            formattedJSON?.choices &&
+            formattedJSON.choices[0]?.delta?.content
+          ) {
+            if (!chuckStreamData) {
+              setStreamingData(
+                (prevData) => prevData + formattedJSON.choices[0].delta.content
+              );
+            } else {
+              setStreamingData(formattedJSON.choices[0].delta.content);
+            }
           }
         } catch (error) {
           console.log("Waiting for valid JSON...");
@@ -130,4 +164,3 @@ async function handleStreamResponse(response: Response, controller: AbortControl
   message.success("Streaming completed");
   setLoading(false);
 }
-

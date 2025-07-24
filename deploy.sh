@@ -3,6 +3,9 @@
 # Stop on errors
 set -e
 
+echo "Generating SSL certificates..."
+./generate-certs.sh
+
 echo "Building React app..."
 npm run build
 
@@ -14,5 +17,5 @@ docker-compose down || true
 docker-compose up -d
 
 echo "Deployment complete!"
-echo "Your application is running at http://localhost:5000"
+echo "Your application is running at https://localhost"
 echo "Note: It may take a few seconds to start up."

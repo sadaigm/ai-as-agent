@@ -4,11 +4,14 @@ FROM nginx:alpine
 # Copy custom Nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
+# Copy SSL certificates
+COPY ssl/ /etc/nginx/ssl/
+
 # Copy built files from host machine to Nginx directory
 COPY build/ /usr/share/nginx/html/
 
-# Expose port 80
-EXPOSE 80
+# Expose ports 80 and 443
+EXPOSE 80 443
 
 # Start Nginx server
 CMD ["nginx", "-g", "daemon off;"]

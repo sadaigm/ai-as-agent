@@ -4,7 +4,8 @@ services:
     image: ai-agent-ui
     container_name: ai-agent-ui
     ports:
-      - "5000:80"
+      - "80:80"   # Map HTTP port
+      - "443:443" # Map HTTPS port
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:80"]
