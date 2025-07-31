@@ -102,8 +102,10 @@ const VoiceAgent = () => {
       //   setTranscript(recordedText);
       //   speak(recordedText); // Assuming you want to speak the recorded text
       //   invoke the speak here
+    } else {
+      console.log("no content to speak recording :", isRecording);
     }
-  }, [recordedText]);
+  }, [recordedText, isRecording]);
 
   const startWelcome = () => {
     console.log("Starting welcome message");
@@ -126,11 +128,12 @@ const VoiceAgent = () => {
   };
   useEffect(() => {
     if (status === "welcome-ended") {
+      stopSpeechDetection(); // Ensure recording is stopped before speaking
       stopSpeaking();
       console.log("Welcome message ended, starting speech detection");
       startSpeechDetection();
     } else if (status === "ended") {
-      console.log("Speech ended, stopping speech detection");
+      stopSpeechDetection(); // Stop recording before handling response
       setConversation((prev) => [
         ...prev,
         {
@@ -138,11 +141,11 @@ const VoiceAgent = () => {
           content: responseData || streamingData || "No response",
         },
       ]);
-      stopSpeechDetection();
       stopSpeaking();
-      startSpeechDetection();
+      startSpeechDetection(); // Only start listening after speaking is fully stopped
     } else if (status === "error") {
       console.error("An error occurred during speech processing");
+      stopSpeechDetection(); // Stop recording on error
       stopSpeaking();
     }
   }, [status]);
@@ -169,10 +172,9 @@ const VoiceAgent = () => {
     setConversation([]);
     console.log("Cleared all speech detection and transcript");
   };
-  console.log("streamingData:", streamingData);
-
   useEffect(() => {
     if (streamingData) {
+      console.log("streamingData:", streamingData);
       setTranscript((prev) => prev + streamingData);
       streamHandler(streamingData, selectedVoice?.lang || "en-US");
       console.log("Updated transcript with streaming data:", streamingData);

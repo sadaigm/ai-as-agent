@@ -134,3 +134,9 @@ build
 blogs
 schema
 temp
+ssl/
+src/ai/components/voice-agent/hooks/useSilenceDetection.tsx
+src/ai/components/voice-agent/hooks/useSpeechSynthesis.ts
+src/ai/components/voice-agent/AgentTalk.tsx
+src/ai/components/voice-agent/SpeechToTextRecorder.tsx
+src/ai/components/voice-agent/TextToSpeech.tsx

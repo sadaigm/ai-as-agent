@@ -9,6 +9,8 @@ import {
   AntDesignOutlined,
   ToolOutlined,
   PartitionOutlined,
+  PhoneOutlined,
+  CommentOutlined,
 } from "@ant-design/icons";
 import { Button, Layout, Menu, MenuProps, theme } from "antd";
 import AiRoutes from "./AiRoutes";
@@ -69,20 +71,25 @@ const Ai = () => {
     window.location.pathname.replace("/", "") || "playground-ai"
   );
 
-  useEffect(() => {    
-    if(window.location.pathname.startsWith("/workflow-ai-open")) {
+  useEffect(() => {
+    if (window.location.pathname.startsWith("/workflow-ai-open")) {
       // alert(window.location.pathname);
-      const workflowId = window.location.pathname.replace("/workflow-ai-open", "workflow-ai-open");
+      const workflowId = window.location.pathname.replace(
+        "/workflow-ai-open",
+        "workflow-ai-open"
+      );
       setCurrent(workflowId);
       setdynamicMenus([
         {
           key: workflowId,
           icon: <PartitionOutlined />,
-          label: `${window.location.pathname.replace("/workflow-ai-open/", "")} Workflow AI `,
+          label: `${window.location.pathname.replace(
+            "/workflow-ai-open/",
+            ""
+          )} Workflow AI `,
         },
       ]);
-    }
-    else{
+    } else {
       setdynamicMenus([]);
     }
   }, [window.location.pathname]);
@@ -188,10 +195,10 @@ const Ai = () => {
                   },
                   {
                     key: "speech-to-text",
-                    icon: <PartitionOutlined />,
+                    icon: <CommentOutlined />,
                     label: "Speech to Text",
                   },
-                  ...dynamicMenus
+                  ...dynamicMenus,
                 ]}
               />
               <Menu

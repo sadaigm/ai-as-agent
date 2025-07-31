@@ -12,6 +12,7 @@ const useSpeechProcessor = () => {
   const queueRef = useRef<string[]>([]);
 
   function streamHandler(textChunk: string, lang: string = "en-US") {
+    console.log("Processing text chunk:", textChunk);
     bufferRef.current += textChunk;
 
     const trimmed = bufferRef.current.trim();
@@ -37,6 +38,14 @@ const useSpeechProcessor = () => {
   const processQueue = (lang: string = "en-US") => {
     if (isProcessingRef.current || queueRef.current.length === 0) return;
 
+    // Skip all empty strings at the start of the queue
+    while (queueRef.current.length > 0 && queueRef.current[0].trim() === "") {
+      queueRef.current.shift();
+    }
+
+    // If queue is now empty after removing empty strings, return
+    if (queueRef.current.length === 0) return;
+
     const nextChunk = queueRef.current.shift();
     if (nextChunk) {
       isProcessingRef.current = true;
@@ -45,6 +54,12 @@ const useSpeechProcessor = () => {
   };
 
   const pushToQueue = (chunk: string, lang: string = "en-US") => {
+    // Skip empty chunks
+    if (chunk.trim() === "") {
+      console.log("Skipping empty chunk");
+      return;
+    }
+
     if (queueRef.current.length == 0) {
       queueRef.current.push(chunk);
       processQueue(lang);
@@ -71,16 +86,20 @@ const useSpeechProcessor = () => {
         setIsSpeaking(false);
         setStatus("welcome-ended");
       } else {
-        if (queueRef.current.length === 0) {
+        if (
+          queueRef.current.length === 0 ||
+          queueRef.current.every((chunk) => chunk.trim() === "")
+        ) {
           setIsSpeaking(false);
           setStatus("ended");
+          console.log("Status:  ended");
         }
       }
 
       console.log(queueRef.current);
 
       console.log("Speech ended");
-      // setIsSpeaking(false);
+      setIsSpeaking(false);
       utteranceRef.current = null;
       isProcessingRef.current = false;
       if (!isWelcome) {
