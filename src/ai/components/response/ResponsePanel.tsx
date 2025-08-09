@@ -132,83 +132,139 @@ const ResponsePanel: React.FC<ResponseProps> = ({
       className="agent__result"
       title="Result"
       bordered={false}
-      style={{ flex: 1 }}
+      style={{
+        flex: 1,
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        overflow: "hidden",
+      }}
       extra={
         <Space>
           <Button onClick={clearResponse}>Clear</Button>
         </Space>
       }
+      bodyStyle={{
+        flex: 1,
+        padding: "16px",
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
+      }}
     >
-      {useConversation && conversation.length > 0 && (
-        <div className="response__conversation">
-          {conversation.map((msg, index) => {
-            const message = msg as any;
-            if (message.content) {
-              return message.role === "user" ? (
-                <div key={index} className={`response__message ${message.role}`}>
-                  <div style={{ marginBottom: "5px" }}>
-                    <strong style={{ textTransform: "capitalize", color: "#3f51b5" }}> 
-                      {message.role}:
-                    </strong>
-                  </div>
-
-                  <div>
-                    <span>{message.content}</span>
-                  </div>
-                </div>
-              ) : (
-                <div key={index} className={`response__message ${message.role}`}>
-                  <div >
-                    <strong style={{ textTransform: "capitalize", color: "#607d8b" }}>
-                      {message.role}:
-                    </strong>
-                  </div>
-                  <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
-                    components={{
-                      pre: PreBlock,
-                      code: CodeBlock,
-                    }}
-                    children={message.content}
-                  />
-                </div>
-              );
-            }
-          })}
-        </div>
-      )}
-
-      {thinkingContent ? (
-        <Collapse
-          bordered={false}
-          defaultActiveKey={["2"]}
-          expandIcon={({ isActive }) => (
-            <CaretRightOutlined rotate={isActive ? 90 : 0} />
-          )}
-          style={{ background: token.colorBgContainer }}
-          items={getItems(panelStyle)}
-        />
-      ) : parsedResponse ? (
-        <>
-          <div >
-            <strong style={{ textTransform: "capitalize" }}>
-              {"assistant"}:
-            </strong>
-          </div>
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            components={{
-              pre: PreBlock,
-              code: CodeBlock,
+      <div
+        style={{
+          flex: 1,
+          overflow: "auto",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        {useConversation && conversation.length > 0 && (
+          <div
+            className="response__conversation"
+            style={{
+              flex: 1,
+              overflow: "auto",
+              marginBottom: "16px",
             }}
-            children={parsedResponse}
-          />
-        </>
-      ) : conversation.length > 0 ? (
-        <></>
-      ) : (
-        <Empty />
-      )}
+          >
+            {conversation.map((msg, index) => {
+              const message = msg as any;
+              if (message.content) {
+                return message.role === "user" ? (
+                  <div
+                    key={index}
+                    className={`response__message ${message.role}`}
+                  >
+                    <div style={{ marginBottom: "5px" }}>
+                      <strong
+                        style={{
+                          textTransform: "capitalize",
+                          color: "#3f51b5",
+                        }}
+                      >
+                        {message.role}:
+                      </strong>
+                    </div>
+
+                    <div>
+                      <span>{message.content}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    key={index}
+                    className={`response__message ${message.role}`}
+                  >
+                    <div>
+                      <strong
+                        style={{
+                          textTransform: "capitalize",
+                          color: "#607d8b",
+                        }}
+                      >
+                        {message.role}:
+                      </strong>
+                    </div>
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        pre: PreBlock,
+                        code: CodeBlock,
+                      }}
+                      children={message.content}
+                    />
+                  </div>
+                );
+              }
+            })}
+          </div>
+        )}
+
+        {thinkingContent ? (
+          <div style={{ flex: 1, overflow: "auto" }}>
+            <Collapse
+              bordered={false}
+              defaultActiveKey={["2"]}
+              expandIcon={({ isActive }) => (
+                <CaretRightOutlined rotate={isActive ? 90 : 0} />
+              )}
+              style={{ background: token.colorBgContainer }}
+              items={getItems(panelStyle)}
+            />
+          </div>
+        ) : parsedResponse ? (
+          <div style={{ flex: 1, overflow: "auto" }}>
+            <div>
+              <strong style={{ textTransform: "capitalize" }}>
+                {"assistant"}:
+              </strong>
+            </div>
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                pre: PreBlock,
+                code: CodeBlock,
+              }}
+              children={parsedResponse}
+            />
+          </div>
+        ) : conversation.length > 0 ? (
+          <></>
+        ) : (
+          <div
+            style={{
+              flex: 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Empty />
+          </div>
+        )}
+      </div>
     </Card>
   );
 };

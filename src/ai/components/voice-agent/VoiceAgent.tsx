@@ -1,4 +1,4 @@
-import { Button, Card, message, Select, Space } from "antd";
+import { message, Select, Checkbox } from "antd";
 import React, { useEffect, useState } from "react";
 import useSpeechDetector from "./hooks/useSpeechDetector";
 import RecordButton from "./components/RecordButton";
@@ -18,14 +18,19 @@ import ResponsePanel from "../response/ResponsePanel";
 import { AgentToolFunctionResponse } from "../../core/AgentToolFunction";
 import AIProcessing from "./components/AIProcessing";
 import { hindiIntroText, tamilIntroText } from "./SpeechToTextRecorder";
+import useScreenSize from "../../hooks/useScreenSize";
+import "./VoiceAgent.css";
 
 const VoiceAgent = () => {
-  const [agentPrompt, setAgentPrompt] = useState<SystemRolePrompt>({
+  const { screenSize } = useScreenSize();
+  const [agentPrompt] = useState<SystemRolePrompt>({
     systemRole: "Friday Voice Agent",
     systemPrompt: defaultSystemPrompt,
     id: "friday-voice-agent-prompt",
   });
+  const [useConversationChat, setuseConversationChat] = useState(false);
   const [transcript, setTranscript] = React.useState<string>("");
+  const [fullscript, setFullscript] = React.useState<string>("");
   const [conversation, setConversation] = useState<
     Array<UserMessage | ToolMessage | AgentToolFunctionResponse | SystemMessage>
   >([]);
@@ -47,7 +52,6 @@ const VoiceAgent = () => {
     setResponseData,
     setStreamingData,
     abortController,
-    setAbortController,
     setLoading,
   } = useAgent();
   const {
@@ -94,11 +98,21 @@ const VoiceAgent = () => {
       if (selectedVoice && selectedVoice.lang) {
         agentPrompt.systemPrompt += `\n\n User's language: ${selectedVoice.lang}`;
       }
+      setFullscript((prev) => prev + transcript);
+      console.log("Full script:", fullscript);
+      setTranscript("");
+      setResponseData(null);
+      setStreamingData("");
       setConversation((prev) => [
         ...prev,
         { role: "user", content: recordedText },
       ]);
-      callAgent(recordedText, agentPrompt.systemPrompt);
+      callAgent(
+        recordedText,
+        agentPrompt.systemPrompt,
+        useConversationChat,
+        conversation
+      );
       //   setTranscript(recordedText);
       //   speak(recordedText); // Assuming you want to speak the recorded text
       //   invoke the speak here
@@ -138,7 +152,7 @@ const VoiceAgent = () => {
         ...prev,
         {
           role: "assistant",
-          content: responseData || streamingData || "No response",
+          content: transcript || responseData || streamingData || "No response",
         },
       ]);
       stopSpeaking();
@@ -182,72 +196,137 @@ const VoiceAgent = () => {
   }, [streamingData]);
 
   return (
-    <div className="flex flex-col items-center p-4 border rounded shadow-md max-w-md mx-auto bg-white">
-      <h1>Voice Agent : {agentPrompt.systemRole}</h1>
-      <p>This component will handle voice interactions.</p>
-
-      {/* Voice selection dropdown */}
-      <div style={{ width: "100%", marginBottom: 12 }}>
-        <Select
-          showSearch
-          style={{ width: "100%" }}
-          value={selectedVoice?.voiceURI}
-          onChange={(voiceURI) => {
-            const found = voices.find((v) => v.voiceURI === voiceURI);
-            setSelectedVoice(found || null);
-          }}
-        >
-          {voices.map((voice, idx) => (
-            <Select.Option
-              key={`${voice.voiceURI}-${idx}`}
-              value={voice.voiceURI}
-            >
-              {voice.name}
-              {voice.lang ? ` (${voice.lang})` : ""}
-            </Select.Option>
-          ))}
-        </Select>
-      </div>
-
-      <Space
-        direction="vertical"
+    <div
+      className="voice-agent-container"
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        padding:
+          screenSize === "mobile"
+            ? "8px"
+            : screenSize === "tablet"
+            ? "12px"
+            : "16px",
+        height: "100%",
+        width: "100%",
+        maxWidth: "none",
+        margin: "0",
+        backgroundColor: "#f4f4ea",
+        overflow: "hidden",
+      }}
+    >
+      <div
+        className="voice-agent-header"
         style={{
-          width: "100%",
-          display: "flex",
-          overflowY: "auto",
+          marginBottom: "16px",
+          flexShrink: 0,
         }}
       >
-        <Space>
-          <>
-            <>
-              {isRecording ? (
-                <StopButton onClick={stopEverything} />
-              ) : (
-                <RecordButton onClick={startWelcome} />
-              )}
-            </>
-            {isSpeaking ? (
-              <Speaking />
-            ) : (
-              agentLoading && (
-                <AIProcessing
-                  onAbort={() => {
-                    if (abortController) {
-                      abortController.abort(); // Abort the fetch request if in progress
-                      message.warning("Request was canceled");
-                      setLoading(false); // Stop loading
-                    }
-                  }}
-                />
-              )
-            )}
-          </>
+        <h1
+          style={{
+            fontSize: "clamp(1.2rem, 3vw, 1.8rem)",
+            margin: "0 0 8px 0",
+            textAlign: "center",
+          }}
+        >
+          Voice Agent : {agentPrompt.systemRole}
+        </h1>
+        <p
+          style={{
+            fontSize: "clamp(0.9rem, 2.5vw, 1rem)",
+            margin: "0 0 16px 0",
+            textAlign: "center",
+            color: "#666",
+          }}
+        >
+          This component will handle voice interactions.
+        </p>
+
+        {/* Voice selection dropdown */}
+        <div style={{ width: "100%", marginBottom: 16 }}>
+          <Select
+            showSearch
+            style={{ width: "100%" }}
+            value={selectedVoice?.voiceURI}
+            onChange={(voiceURI) => {
+              const found = voices.find((v) => v.voiceURI === voiceURI);
+              setSelectedVoice(found || null);
+            }}
+          >
+            {voices.map((voice, idx) => (
+              <Select.Option
+                key={`${voice.voiceURI}-${idx}`}
+                value={voice.voiceURI}
+              >
+                {voice.name}
+                {voice.lang ? ` (${voice.lang})` : ""}
+              </Select.Option>
+            ))}
+          </Select>
+        </div>
+
+        {/* Control buttons */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: screenSize === "mobile" ? "8px" : "12px",
+            marginBottom: "16px",
+            flexWrap: "wrap",
+            flexDirection: screenSize === "mobile" ? "column" : "row",
+          }}
+        >
+          {/* Use Conversation Checkbox */}
+          <Checkbox
+            checked={useConversationChat}
+            onChange={(e) => setuseConversationChat(e.target.checked)}
+            style={{
+              fontSize: screenSize === "mobile" ? "14px" : "16px",
+              marginRight: screenSize === "mobile" ? "0" : "16px",
+              marginBottom: screenSize === "mobile" ? "8px" : "0",
+            }}
+          >
+            Use Conversation
+          </Checkbox>
+
+          {isRecording ? (
+            <StopButton onClick={stopEverything} />
+          ) : (
+            <RecordButton onClick={startWelcome} />
+          )}
+
+          {isSpeaking ? (
+            <Speaking />
+          ) : (
+            agentLoading && (
+              <AIProcessing
+                onAbort={() => {
+                  if (abortController) {
+                    abortController.abort();
+                    message.warning("Request was canceled");
+                    setLoading(false);
+                  }
+                }}
+              />
+            )
+          )}
 
           <ClearButton onClick={handleClear} />
-        </Space>
+        </div>
+      </div>
 
+      {/* Response Panel Container */}
+      <div
+        className="voice-agent-response"
+        style={{
+          flex: 1,
+          minHeight: 0,
+          overflow: "hidden",
+        }}
+      >
         <ResponsePanel
-          useConversation={false}
+          useConversation={useConversationChat}
           conversation={conversation}
           setConversation={setConversation}
           responseData={responseData}
@@ -255,15 +334,21 @@ const VoiceAgent = () => {
           setResponseData={setResponseData}
           setStreamingData={setStreamingData}
         />
+      </div>
 
-        {/* Added Card to display the transcript */}
-        {/* <div>
-          <Card title="Transcript" bordered>
-            <p>{transcript || "No transcript available yet."}</p>
-          </Card>
-        </div> */}
-      </Space>
-      {error && <div className="text-red-500 mt-2">{error}</div>}
+      {error && (
+        <div
+          style={{
+            color: "#f5222d",
+            marginTop: "8px",
+            textAlign: "center",
+            fontSize: "0.9rem",
+            flexShrink: 0,
+          }}
+        >
+          {error}
+        </div>
+      )}
     </div>
   );
 };

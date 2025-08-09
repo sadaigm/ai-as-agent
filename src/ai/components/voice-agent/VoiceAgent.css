@@ -1,0 +1,142 @@
+/* VoiceAgent responsive styles */
+.voice-agent-container {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.voice-agent-header {
+  flex-shrink: 0;
+}
+
+.voice-agent-response {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Mobile responsive styles */
+@media (max-width: 576px) {
+  .voice-agent-container {
+    padding: 8px !important;
+  }
+  
+  .voice-agent-header h1 {
+    font-size: 1.2rem !important;
+    margin-bottom: 4px !important;
+  }
+  
+  .voice-agent-header p {
+    font-size: 0.9rem !important;
+    margin-bottom: 12px !important;
+  }
+  
+  .voice-agent-header > div:last-of-type {
+    gap: 8px !important;
+    margin-bottom: 12px !important;
+  }
+  
+  /* Make buttons smaller on mobile */
+  .voice-agent-header .ant-btn {
+    padding: 4px 8px;
+    font-size: 12px;
+    height: auto;
+  }
+  
+  /* Adjust select dropdown for mobile */
+  .voice-agent-header .ant-select {
+    font-size: 14px;
+  }
+  
+  /* Adjust checkbox for mobile */
+  .voice-agent-header .ant-checkbox-wrapper {
+    font-size: 14px !important;
+  }
+}
+
+/* Tablet responsive styles */
+@media (max-width: 768px) and (min-width: 577px) {
+  .voice-agent-container {
+    padding: 12px !important;
+  }
+  
+  .voice-agent-header h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .voice-agent-header p {
+    font-size: 0.95rem !important;
+  }
+  
+  .voice-agent-header > div:last-of-type {
+    gap: 10px !important;
+  }
+}
+
+/* Ensure ResponsePanel is properly sized */
+.voice-agent-response .agent__result {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.voice-agent-response .agent__result .ant-card-body {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Fix overflow scrolling for conversation */
+.voice-agent-response .response__conversation {
+  overflow-y: auto;
+  max-height: 100%;
+}
+
+.voice-agent-response .response__message {
+  margin-bottom: 12px;
+  padding: 8px;
+  border-radius: 6px;
+  background-color: #f8f9fa;
+}
+
+.voice-agent-response .response__message.user {
+  background-color: #e3f2fd;
+  align-self: flex-end;
+}
+
+.voice-agent-response .response__message.assistant {
+  background-color: #f1f8e9;
+  align-self: flex-start;
+}
+
+/* Responsive adjustments for buttons */
+@media (max-width: 480px) {
+  .voice-agent-header > div:last-of-type {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .voice-agent-header .ant-btn {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  
+  .voice-agent-header .ant-btn:last-child {
+    margin-bottom: 0;
+  }
+}
+
+/* Improve scrolling on mobile devices */
+@media (max-width: 768px) {
+  .voice-agent-response {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .voice-agent-response .ant-card-body {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .response__conversation {
+    -webkit-overflow-scrolling: touch;
+  }
+}

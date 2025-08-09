@@ -18,6 +18,7 @@
       transform: rotate(360deg);
     }
   }
+  
   .response__message {
     border: 1px solid lightgrey;
     padding: 10px;
@@ -26,10 +27,49 @@
     display: flex;
     flex-direction: column;
   }
+  
   .user {
     align-items: end;
   }
+  
   .assistant{
     align-items: start;
+  }
+
+  /* Improved responsive design */
+  .response__conversation {
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 100%;
+    padding-right: 8px;
+  }
+
+  /* Ensure proper scrolling behavior */
+  .agent__result .ant-card-body {
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Mobile responsive improvements */
+  @media (max-width: 768px) {
+    .response__message {
+      padding: 8px;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    
+    .response__conversation {
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .response__message {
+      padding: 6px;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
   }
   
