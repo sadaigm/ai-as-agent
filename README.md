@@ -227,6 +227,43 @@ After building the app, you can preview it locally:
 npm run preview
 ```
 
+## Setting up Ollama Environment with HTTPS
+
+To set up the Ollama environment with HTTPS and use it from the UI, follow these steps:
+
+### Prerequisites
+- Ensure Docker and Docker Compose are installed on your system.
+- OpenSSL should be available for generating SSL certificates.
+
+### Steps
+
+1. **Generate SSL Certificates**
+   - Run the `setup.sh` script to generate the required SSL certificates (`cert.pem` and `key.pem`) in the `setup/ssl` directory.
+     ```bash
+     bash setup.sh
+     ```
+   - This script will also start the Docker containers.
+
+2. **Verify Docker Containers**
+   - Ensure the `ollama` and `nginx-ssl` containers are running:
+     ```bash
+     docker ps
+     ```
+
+3. **Access the UI**
+   - Open your browser and navigate to `https://localhost`. The UI should now be accessible with HTTPS enabled.
+
+4. **Using the Ollama Environment**
+   - The `nginx` container acts as a reverse proxy to the `ollama` service.
+   - Ensure the `ollama` service is reachable at `https://localhost:11434`.
+
+### Notes
+- If you encounter any issues, check the logs of the containers:
+  ```bash
+  docker logs <container_name>
+  ```
+- Replace `<container_name>` with `ollama` or `nginx-ssl` as needed.
+
 ## File Structure
 
 - `src/`: Main source code folder.
