@@ -1,0 +1,27 @@
+version: "3.8"
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./ollama_data:/root/.ollama # Persist models/configs
+    restart: unless-stopped
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all # Use all available GPUs
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility # Enable compute and utility capabilities
+      - OLLAMA_HOST=0.0.0.0:11434
+      - OLLAMA_ORIGINS=*
+  nginx:
+    image: nginx:latest
+    container_name: nginx-ssl
+    ports:
+      - "443:443"
+    volumes:
+      - ./setup/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./setup/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - ollama
+    restart: unless-stopped
